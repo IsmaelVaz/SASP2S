@@ -23,9 +23,8 @@ type
     pnMouTreina: TPanel;
     pnMouTemp: TPanel;
     pnMouManu: TPanel;
-    CategoryPanelGroup1: TCategoryPanelGroup;
-    CategoryPanel1: TCategoryPanel;
-    CategoryPanel2: TCategoryPanel;
+    Panel2: TPanel;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure AjustarAlinhamento();
@@ -41,6 +40,8 @@ type
     procedure pnTemplateMouseLeave(Sender: TObject);
     procedure pnTreinamentoMouseEnter(Sender: TObject);
     procedure pnTreinamentoMouseLeave(Sender: TObject);
+    procedure Label1MouseEnter(Sender: TObject);
+    procedure Label1MouseLeave(Sender: TObject);
     procedure pnManutencaoClick(Sender: TObject);
   private
     { Private declarations }
@@ -66,6 +67,16 @@ procedure TForm1.FormResize(Sender: TObject);
 
 begin
   AjustarAlinhamento;
+end;
+
+procedure TForm1.Label1MouseEnter(Sender: TObject);
+begin
+  Label1.Font.Style:= Label1.Font.Style + [fsUnderline];
+end;
+
+procedure TForm1.Label1MouseLeave(Sender: TObject);
+begin
+  Label1.Font.Style:= Label1.Font.Style - [fsUnderline];
 end;
 
 procedure TForm1.pnAtendimentoMouseEnter(Sender: TObject);
@@ -100,6 +111,7 @@ end;
 
 procedure TForm1.pnManutencaoClick(Sender: TObject);
 begin
+  Panel2.Visible:= true;
   pnMouManu.Visible:= true;
 end;
 
@@ -110,6 +122,7 @@ end;
 
 procedure TForm1.pnManutencaoMouseLeave(Sender: TObject);
 begin
+  if not Panel2.Visible then
     pnMouManu.Visible:=false;
 end;
 
