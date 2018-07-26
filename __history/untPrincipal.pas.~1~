@@ -1,0 +1,67 @@
+unit untPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls;
+
+type
+  TForm1 = class(TForm)
+    pnMenu: TPanel;
+    pnAtendimento: TPanel;
+    pnManutencao: TPanel;
+    pnInstalacao: TPanel;
+    pnTreinamento: TPanel;
+    pnTemplate: TPanel;
+    pnIniciante: TPanel;
+    procedure FormCreate(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+  private
+    { Private declarations }
+    tamanhoBloco, metadeBloco: integer;
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm1.FormCreate(Sender: TObject);
+
+begin
+  tamanhoBloco:= (pnMenu.Width div 6) - 100;
+  metadeBloco:= tamanhoBloco div 2;
+
+  pnMenu.Left:= (Form1.Width div 2) - (pnMenu.Width div 2);
+  pnAtendimento.Left:= metadeBloco - (pnAtendimento.Width div 2);
+  pnManutencao.Left:= (tamanhoBloco * 1) + metadeBloco  - (pnManutencao.Width div 2);
+  pnInstalacao.Left:= (tamanhoBloco * 2) + metadeBloco  - (pnInstalacao.Width div 2);
+  pnTreinamento.Left:= (tamanhoBloco * 3) + metadeBloco - (pnTreinamento.Width div 2);
+  pnTemplate.Left:= (tamanhoBloco * 4) + metadeBloco - (pnTemplate.Width div 2);
+  pnIniciante.Left:= (tamanhoBloco * 5) + metadeBloco  - (pnIniciante.Width div 2);
+
+
+
+end;
+
+procedure TForm1.FormResize(Sender: TObject);
+
+begin
+  tamanhoBloco:= pnMenu.Width div 6;
+  metadeBloco:= tamanhoBloco div 2;
+
+  pnMenu.Left:= (Form1.Width div 2) - (pnMenu.Width div 2);
+  pnAtendimento.Left:= metadeBloco - (pnAtendimento.Width div 2);
+  pnManutencao.Left:= (tamanhoBloco * 1) + metadeBloco  - (pnManutencao.Width div 2);
+  pnInstalacao.Left:= (tamanhoBloco * 2) + metadeBloco  - (pnInstalacao.Width div 2);
+  pnTreinamento.Left:= (tamanhoBloco * 3) + metadeBloco - (pnTreinamento.Width div 2);
+  pnTemplate.Left:= (tamanhoBloco * 4) + metadeBloco - (pnTemplate.Width div 2);
+  pnIniciante.Left:= (tamanhoBloco * 5) + metadeBloco  - (pnIniciante.Width div 2);
+end;
+
+end.
