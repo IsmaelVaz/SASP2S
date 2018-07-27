@@ -1,0 +1,25 @@
+unit untAtendimento;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ComCtrls;
+
+type
+  TfrmAtendimento = class(TForm)
+    TabControl1: TTabControl;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmAtendimento: TfrmAtendimento;
+
+implementation
+
+{$R *.dfm}
+
+end.

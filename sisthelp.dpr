@@ -2,13 +2,14 @@ program sisthelp;
 
 uses
   Forms,
-  untPrincipal in 'untPrincipal.pas' {Form1};
+  untPrincipal in 'untPrincipal.pas' {frmPrincipal},
+  untAtendimento in 'untAtendimento.pas' {frmAtendimento};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.Run;
 end.

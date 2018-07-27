@@ -5,10 +5,10 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, ExtCtrls, StdCtrls, ButtonGroup, Buttons, Grids,
-  ComCtrls, TabNotBk, dblookup, untAtendimento;
+  ComCtrls, TabNotBk, dblookup;
 
 type
-  TfrmPrincipal = class(TForm)
+  TForm1 = class(TForm)
     pnMenu: TPanel;
     pnAtendimento: TPanel;
     pnManutencao: TPanel;
@@ -23,6 +23,9 @@ type
     pnMouTreina: TPanel;
     pnMouTemp: TPanel;
     pnMouManu: TPanel;
+    CategoryPanelGroup1: TCategoryPanelGroup;
+    CategoryPanel1: TCategoryPanel;
+    CategoryPanel2: TCategoryPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure AjustarAlinhamento();
@@ -39,7 +42,6 @@ type
     procedure pnTreinamentoMouseEnter(Sender: TObject);
     procedure pnTreinamentoMouseLeave(Sender: TObject);
     procedure pnManutencaoClick(Sender: TObject);
-    procedure pnAtendimentoClick(Sender: TObject);
   private
     { Private declarations }
     tamanhoBloco, metadeBloco: integer;
@@ -48,99 +50,90 @@ type
   end;
 
 var
-  frmPrincipal: TfrmPrincipal;
+  Form1: TForm1;
 
 implementation
 
 {$R *.dfm}
 
-procedure TfrmPrincipal.FormCreate(Sender: TObject);
+procedure TForm1.FormCreate(Sender: TObject);
 
 begin
   AjustarAlinhamento;
 end;
 
-procedure TfrmPrincipal.FormResize(Sender: TObject);
+procedure TForm1.FormResize(Sender: TObject);
 
 begin
   AjustarAlinhamento;
 end;
 
-
-
-
-procedure TfrmPrincipal.pnAtendimentoClick(Sender: TObject);
-begin
-  Application.CreateForm(TfrmAtendimento, frmAtendimento);
-  Application.Run;
-end;
-
-procedure TfrmPrincipal.pnAtendimentoMouseEnter(Sender: TObject);
+procedure TForm1.pnAtendimentoMouseEnter(Sender: TObject);
 begin
   pnMouAten.Visible:= true;
 end;
 
-procedure TfrmPrincipal.pnAtendimentoMouseLeave(Sender: TObject);
+procedure TForm1.pnAtendimentoMouseLeave(Sender: TObject);
 begin
   pnMouAten.Visible:= false;
 end;
 
-procedure TfrmPrincipal.pnInicianteMouseEnter(Sender: TObject);
+procedure TForm1.pnInicianteMouseEnter(Sender: TObject);
 begin
   pnMouIni.Visible:=true;
 end;
 
-procedure TfrmPrincipal.pnInicianteMouseLeave(Sender: TObject);
+procedure TForm1.pnInicianteMouseLeave(Sender: TObject);
 begin
   pnMouIni.Visible:=false;
 end;
 
-procedure TfrmPrincipal.pnInstalacaoMouseEnter(Sender: TObject);
+procedure TForm1.pnInstalacaoMouseEnter(Sender: TObject);
 begin
   pnMouInst.Visible:=true;
 end;
 
-procedure TfrmPrincipal.pnInstalacaoMouseLeave(Sender: TObject);
+procedure TForm1.pnInstalacaoMouseLeave(Sender: TObject);
 begin
   pnMouInst.Visible:=false;
 end;
 
-procedure TfrmPrincipal.pnManutencaoClick(Sender: TObject);
+procedure TForm1.pnManutencaoClick(Sender: TObject);
 begin
   pnMouManu.Visible:= true;
 end;
 
-procedure TfrmPrincipal.pnManutencaoMouseEnter(Sender: TObject);
+procedure TForm1.pnManutencaoMouseEnter(Sender: TObject);
 begin
   pnMouManu.Visible:=true;
 end;
 
-procedure TfrmPrincipal.pnManutencaoMouseLeave(Sender: TObject);
+procedure TForm1.pnManutencaoMouseLeave(Sender: TObject);
 begin
     pnMouManu.Visible:=false;
 end;
 
-procedure TfrmPrincipal.pnTemplateMouseEnter(Sender: TObject);
+procedure TForm1.pnTemplateMouseEnter(Sender: TObject);
 begin
   pnMouTemp.Visible:=true;
 end;
 
-procedure TfrmPrincipal.pnTemplateMouseLeave(Sender: TObject);
+procedure TForm1.pnTemplateMouseLeave(Sender: TObject);
 begin
   pnMouTemp.Visible:=false;
 end;
 
-procedure TfrmPrincipal.pnTreinamentoMouseEnter(Sender: TObject);
+procedure TForm1.pnTreinamentoMouseEnter(Sender: TObject);
 begin
   pnMouTreina.Visible:=true;
 end;
 
-procedure TfrmPrincipal.pnTreinamentoMouseLeave(Sender: TObject);
+procedure TForm1.pnTreinamentoMouseLeave(Sender: TObject);
 begin
   pnMouTreina.Visible:=false;
 end;
 
-procedure TfrmPrincipal.AjustarAlinhamento();
+procedure TForm1.AjustarAlinhamento();
 var
   numBlocos, tamanhoBloco, metadeBloco, tamanhoDisp: integer;
 begin
@@ -172,7 +165,7 @@ begin
   metadeBloco:= tamanhoBloco div 2;
 
   pnMenu.Width:= tamanhoDisp;
-  pnMenu.Left:= (frmPrincipal.Width div 2) - (pnMenu.Width div 2);
+  pnMenu.Left:= (Form1.Width div 2) - (pnMenu.Width div 2);
 
   pnAtendimento.Left:= metadeBloco - (pnAtendimento.Width div 2);
   pnManutencao.Left:= (tamanhoBloco * 1) + metadeBloco  - (pnManutencao.Width div 2);

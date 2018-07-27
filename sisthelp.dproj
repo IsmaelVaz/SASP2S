@@ -44,7 +44,10 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="untPrincipal.pas">
-				<Form>Form1</Form>
+				<Form>frmPrincipal</Form>
+			</DCCReference>
+			<DCCReference Include="untAtendimento.pas">
+				<Form>frmAtendimento</Form>
 			</DCCReference>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
