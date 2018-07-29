@@ -71,8 +71,8 @@ end;
 
 procedure TfrmPrincipal.pnAtendimentoClick(Sender: TObject);
 begin
-  if frmAtendimento = nil then
-    Application.CreateForm(TfrmAtendimento, frmAtendimento);
+  Application.CreateForm(TfrmAtendimento, frmAtendimento);
+  Application.Run;
 end;
 
 procedure TfrmPrincipal.pnAtendimentoMouseEnter(Sender: TObject);

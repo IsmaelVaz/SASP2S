@@ -4,8 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections;
+  Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento, classListaAtendimento ;
 
 type
   TfrmAtendimento = class(TForm)
@@ -105,31 +104,27 @@ begin
   end;
 
   tempListaAtendimento.Adicionar(tempAtendimento);
-  AtualizarGrid;
 end;
 
 
 procedure TfrmAtendimento.AtualizarGrid;
 var
-  listaAtendimento: TObjectList<TclassAtendimento>;
+  listaAtendimento: TList;
   atendimento: TclassAtendimento;
   i: integer;
 begin
   listaAtendimento:= tempListaAtendimento.RetornarLista;
 
-  i:= 1;
   for atendimento in listaAtendimento do
   begin
     with sgridHorarios do
     begin
       RowCount:= listaAtendimento.Count + 1;
 
-      Cells[0,i]:= datetostr(atendimento.dataReferencia);
-      Cells[1,i]:= TimeToStr(atendimento.horaInicial);
-      Cells[2,i]:= TimeToStr(atendimento.horaFinal);
-      Cells[3,i]:= atendimento.descricao;
-      i:= i + 1;
-      ShowMessage(FloatToStr(atendimento.horaInicial));
+      Cells[0,i+1]:= datetostr(atendimento.dataReferencia);
+      Cells[1,i+1]:= TimeToStr(atendimento.horaInicial);
+      Cells[2,i+1]:= TimeToStr(atendimento.horaFinal);
+      Cells[3,i+1]:= atendimento.descricao;
     end;
   end;
 

@@ -1,0 +1,63 @@
+unit classAtendimento;
+
+interface
+
+type
+  TclassAtendimento = class
+  private
+    FhoraFinal: TTime;
+    FhoraInicial: TTime;
+    Fhescricao: String;
+    Foid: integer;
+    FdataReferencia: TDate;
+    procedure SetdataReferencia(const Value: TDate);
+    procedure SetDescricao(const Value: String);
+    procedure SetHoraFinal(const Value: TTime);
+    procedure SetHoraInicial(const Value: TTime);
+    procedure SetOid(const Value: integer);
+
+  public
+    property dataReferencia: TDate read FdataReferencia write SetdataReferencia;
+    property horaInicial: TTime read FHoraInicial write SetHoraInicial;
+    property horaFinal: TTime read FHoraFinal write SetHoraFinal;
+    property hescricao: String read Fdescricao write SetDescricao;
+    property oid: integer read FOid write SetOid;
+  private
+  published
+  protected
+
+end;
+
+implementation
+
+{ TclassAtendimento }
+
+
+{ TclassAtendimento }
+
+procedure TclassAtendimento.SetdataReferencia(const Value: TDate);
+begin
+  FdataReferencia := Value;
+end;
+
+procedure TclassAtendimento.SetDescricao(const Value: String);
+begin
+  FDescricao := Value;
+end;
+
+procedure TclassAtendimento.SetHoraFinal(const Value: TTime);
+begin
+  FHoraFinal := Value;
+end;
+
+procedure TclassAtendimento.SetHoraInicial(const Value: TTime);
+begin
+  FHoraInicial := Value;
+end;
+
+procedure TclassAtendimento.SetOid(const Value: integer);
+begin
+  FOid := Value;
+end;
+
+end.

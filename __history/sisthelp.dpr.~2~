@@ -3,9 +3,7 @@ program sisthelp;
 uses
   Forms,
   untPrincipal in 'untPrincipal.pas' {frmPrincipal},
-  untAtendimento in 'untAtendimento.pas' {frmAtendimento},
-  classAtendimento in 'classAtendimento.pas',
-  classListaAtendimento in 'classListaAtendimento.pas';
+  untAtendimento in 'untAtendimento.pas' {frmAtendimento};
 
 {$R *.res}
 

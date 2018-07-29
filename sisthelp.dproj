@@ -49,6 +49,8 @@
 			<DCCReference Include="untAtendimento.pas">
 				<Form>frmAtendimento</Form>
 			</DCCReference>
+			<DCCReference Include="classAtendimento.pas"/>
+			<DCCReference Include="classListaAtendimento.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
