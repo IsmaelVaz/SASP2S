@@ -55,6 +55,25 @@ implementation
 
 {$R *.dfm}
 
+procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
+begin
+  if not (Key in ['0'..'9', #8]) then abort;
+
+  if Length(edtHoraFinal.Text) = 2 then
+    edtHoraFinal.Text:= Concat(edtHoraFinal.Text, ':');
+    edtHoraFinal.SelStart:= Length(edtHoraFinal.Text);
+end;
+
+procedure TfrmAtendimento.edtHoraInicialKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if not (Key in ['0'..'9', #8]) then abort;
+
+  if Length(edtHoraInicial.Text) = 2 then
+    edtHoraInicial.Text:= Concat(edtHoraInicial.Text, ':');
+    edtHoraInicial.SelStart:= Length(edtHoraInicial.Text);
+
+end;
 
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -95,49 +114,24 @@ var
   descricaoRec: String;
 begin
 
-  if ValidarHora(edtHoraInicial.Text) then
+  ValidarHora(edtHoraInicial.Text);
+  tempAtendimento:= TclassAtendimento.Create;
+
+  dataRefRec:= StrToDate(edtDataRef.Text);
+  horaInicialRec:= StrToTime(edtHoraInicial.Text);
+  horaFinalRec:= StrToTime(edtHoraFinal.Text);
+  descricaoRec:= memoDescricao.Text;
+
+  with tempAtendimento do
   begin
-    if ValidarHora(edtHoraFinal.Text) then
-    begin
-
-      horaInicialRec:= StrToTime(edtHoraInicial.Text);
-      horaFinalRec:= StrToTime(edtHoraFinal.Text);
-
-      if horaFinalRec > horaInicialRec then
-      begin
-        tempAtendimento:= TclassAtendimento.Create;
-
-        dataRefRec:= StrToDate(edtDataRef.Text);
-        descricaoRec:= memoDescricao.Text;
-
-        with tempAtendimento do
-        begin
-            dataReferencia:= dataRefRec;
-            horaInicial:= horaInicialRec;
-            horaFinal:= horaFinalRec;
-            descricao:= descricaoRec;
-        end;
-
-        tempListaAtendimento.Adicionar(tempAtendimento);
-        AtualizarGrid;
-      end
-      else
-      begin
-        ShowMessage('A Hora Final não pode ser maior que a Hora Inicial');
-        edtHoraInicial.SetFocus;
-      end;
-    end
-    else
-    begin
-      ShowMessage('Hora Final invalida');
-      edtHoraFinal.SetFocus;
-    end;
-  end
-  else
-  begin
-    ShowMessage('Hora Inicial inválida');
-    edtHoraInicial.SetFocus;
+      dataReferencia:= dataRefRec;
+      horaInicial:= horaInicialRec;
+      horaFinal:= horaFinalRec;
+      descricao:= descricaoRec;
   end;
+
+  tempListaAtendimento.Adicionar(tempAtendimento);
+  AtualizarGrid;
 end;
 
 procedure TfrmAtendimento.AtualizarGrid;
@@ -165,61 +159,16 @@ begin
 
 end;
 
-function TfrmAtendimento.ValidarHora(horaEnviada: String):boolean;
+function TfrmAtendimento.ValidarHora(horaEnviada:String): boolean;
 var
   horas, minutos: integer;
 
 begin
-  try
-    horas:= StrToInt(Copy(horaEnviada, 1, 2));
-    minutos:= StrToInt(Copy(horaEnviada, 4, 5));
-
-    if (horas <= 23) and (horas > 0) and (minutos <= 59) and (minutos >= 0) then
-      result:= true
-    else
-      result:= false;
-  except
-    result:= false;
-  end;
+  horas:= horaenviada.subs;
+  minutos:= Copy(horaEnviada, 3, 5);
+  ShowMessage('Horas: '+ horas+' - Minutos: '+minutos);
 
 end;
-
-
-// Marcaras de hora
-procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
-begin
-  if not (Key in ['0'..'9', #8]) then abort
-  else
-  begin
-    if not(Key = #8) then
-    begin
-      if Length(edtHoraFinal.Text) = 2 then
-      begin
-        edtHoraFinal.Text:= Concat(edtHoraFinal.Text, ':');
-        edtHoraFinal.SelStart:= Length(edtHoraFinal.Text);
-      end;
-    end;
-  end;
-end;
-
-procedure TfrmAtendimento.edtHoraInicialKeyPress(Sender: TObject;
-  var Key: Char);
-begin
-  if not (Key in ['0'..'9', #8]) then abort
-  else
-  begin
-    if not(Key = #8) then
-    begin
-      if Length(edtHoraInicial.Text) = 2 then
-      begin
-        edtHoraInicial.Text:= Concat(edtHoraInicial.Text, ':');
-        edtHoraInicial.SelStart:= Length(edtHoraInicial.Text);
-      end;
-    end;
-  end;
-
-end;
-
 
 //Parte da Aba Bloco de Notas
 procedure TfrmAtendimento.sbtnLimparClick(Sender: TObject);
