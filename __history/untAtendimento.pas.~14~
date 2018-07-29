@@ -41,7 +41,6 @@ type
 
     function ValidarHora(horaEnviada: String):boolean;
     procedure sbtnSalvarHorarioClick(Sender: TObject);
-    procedure LimparCaixasTexto();
   private
     { Private declarations }
 
@@ -122,7 +121,6 @@ begin
 
         tempListaAtendimento.Adicionar(tempAtendimento);
         AtualizarGrid;
-        LimparCaixasTexto;
       end
       else
       begin
@@ -267,14 +265,6 @@ begin
   end
   else
     ShowMessage('Não há cadastros para Salvar');
-end;
-
-procedure TfrmAtendimento.LimparCaixasTexto();
-begin
-  edtHoraInicial.Clear;
-  edtHoraFinal.Clear;
-  memoDescricao.Lines.Clear;
-  edtHoraInicial.SetFocus;
 end;
 
 //Parte da Aba Bloco de Notas
