@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc;
+  classListaAtendimento, Generics.Collections;
 
 type
   TfrmAtendimento = class(TForm)
@@ -27,9 +27,9 @@ type
     sbtnAbrirHorario: TSpeedButton;
     sbtnSalvarHorario: TSpeedButton;
     SpeedButton3: TSpeedButton;
+    Label4: TLabel;
     Label6: TLabel;
     memoDescricao: TMemo;
-    xmlDoc: TXMLDocument;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -40,7 +40,6 @@ type
     procedure edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
 
     function ValidarHora(horaEnviada: String):boolean;
-    procedure sbtnSalvarHorarioClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -222,51 +221,6 @@ begin
 end;
 
 
-//SALVANDO ATENDIMENTO NO XML
-procedure TfrmAtendimento.sbtnSalvarHorarioClick(Sender: TObject);
-var
-  ixmlAtendimento,Objeto: IXMLNode;
-  listaAtendimento: TObjectList<TclassAtendimento>;
-  tempAtendimento: TclassAtendimento;
-  caminhoArquivo: String;
-begin
-  listaAtendimento:= tempListaAtendimento.RetornarLista;
-
-  if listaAtendimento.Count > 0 then
-  begin
-    if fileSaveDialog.Execute then
-    begin
-      caminhoArquivo:= fileSaveDialog.FileName;
-      if not ContainsText(caminhoArquivo, '.xml') then
-        caminhoArquivo:= Concat(caminhoArquivo, '.xml');
-
-      xmlDoc.Active:=true;
-      xmlDoc.Version:= '1.0';
-      xmlDoc.Encoding:= 'UTF-8';
-
-      Objeto:= xmlDoc.AddChild('Objeto');
-
-      for tempAtendimento in listaAtendimento do
-      begin
-         ixmlAtendimento:= Objeto.AddChild('Atendimento');
-         ixmlAtendimento.Attributes['Oid']:= IntToStr(tempAtendimento.oid);
-
-         ixmlAtendimento.AddChild('DataReferencia').Text := DateToStr(tempAtendimento.dataReferencia);
-         ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
-         ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
-         ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
-         ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
-
-      end;
-      xmlDoc.SaveToFile(caminhoArquivo);
-      xmlDoc.Active:=false;
-      ShowMessage('Cadastros salvos');
-    end;
-  end
-  else
-    ShowMessage('Não há cadastros para Salvar');
-end;
-
 //Parte da Aba Bloco de Notas
 procedure TfrmAtendimento.sbtnLimparClick(Sender: TObject);
 begin
@@ -282,7 +236,6 @@ var
   caminho: String;
   i: integer;
 begin
-
   if fileSaveDialog.Execute then
   begin
     caminho:= fileSaveDialog.FileName;

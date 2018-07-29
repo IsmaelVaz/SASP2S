@@ -225,46 +225,23 @@ end;
 //SALVANDO ATENDIMENTO NO XML
 procedure TfrmAtendimento.sbtnSalvarHorarioClick(Sender: TObject);
 var
-  ixmlAtendimento,Objeto: IXMLNode;
-  listaAtendimento: TObjectList<TclassAtendimento>;
+  ixmlAtendimento: IXMLNode;
+  tempListaAtendimento: TObjectList<TclassAtendimento>;
   tempAtendimento: TclassAtendimento;
-  caminhoArquivo: String;
 begin
-  listaAtendimento:= tempListaAtendimento.RetornarLista;
+  xmlDoc.Active:=true;
+  xmlDoc.Version:= '1.0';
+  xmlDoc.Encoding:= 'UTF-8';
 
-  if listaAtendimento.Count > 0 then
+  xmlDoc.AddChild('Object');
+  tempListaAtendimento:= TclassListaAtendimento.RetornarLista;
+
+  for tempAtendimento in tempListaAtendimento do
   begin
-    if fileSaveDialog.Execute then
-    begin
-      caminhoArquivo:= fileSaveDialog.FileName;
-      if not ContainsText(caminhoArquivo, '.xml') then
-        caminhoArquivo:= Concat(caminhoArquivo, '.xml');
+     ixmlAtendimento:= xmlDoc.AddChild('Atendimento');
+     ixmlAtendimento.Attributes:= 'Oid='+IntToStr(tempAtendimento.oid);
+  end;
 
-      xmlDoc.Active:=true;
-      xmlDoc.Version:= '1.0';
-      xmlDoc.Encoding:= 'UTF-8';
-
-      Objeto:= xmlDoc.AddChild('Objeto');
-
-      for tempAtendimento in listaAtendimento do
-      begin
-         ixmlAtendimento:= Objeto.AddChild('Atendimento');
-         ixmlAtendimento.Attributes['Oid']:= IntToStr(tempAtendimento.oid);
-
-         ixmlAtendimento.AddChild('DataReferencia').Text := DateToStr(tempAtendimento.dataReferencia);
-         ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
-         ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
-         ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
-         ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
-
-      end;
-      xmlDoc.SaveToFile(caminhoArquivo);
-      xmlDoc.Active:=false;
-      ShowMessage('Cadastros salvos');
-    end;
-  end
-  else
-    ShowMessage('Não há cadastros para Salvar');
 end;
 
 //Parte da Aba Bloco de Notas

@@ -66,15 +66,13 @@ begin
   AjustarAlinhamento;
 end;
 
+
+
+
 procedure TfrmPrincipal.pnAtendimentoClick(Sender: TObject);
 begin
   if frmAtendimento = nil then
-  begin
     Application.CreateForm(TfrmAtendimento, frmAtendimento);
-    frmPrincipal.Width:= frmAtendimento.Width;
-    frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height + 20;
-  end;
-
 end;
 
 procedure TfrmPrincipal.pnAtendimentoMouseEnter(Sender: TObject);
@@ -182,9 +180,6 @@ begin
   pnTreinamento.Left:= (tamanhoBloco * 3) + metadeBloco - (pnTreinamento.Width div 2);
   pnTemplate.Left:= (tamanhoBloco * 4) + metadeBloco - (pnTemplate.Width div 2);
   pnIniciante.Left:= (tamanhoBloco * 5) + metadeBloco  - (pnIniciante.Width div 2);
-
-  if frmAtendimento <> nil then
-    frmAtendimento.pgControl.Left:= (frmPrincipal.Width div 2) - (frmAtendimento.pgControl.Width div 2);
 end;
 
 end.
