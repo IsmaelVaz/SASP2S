@@ -14,10 +14,8 @@ type
   public
     constructor Create;
     procedure Adicionar(atendimento: TclassAtendimento);
-    procedure Remover(atendimento: TclassAtendimento);
-
+    procedure Remover(index:Integer);
     function RetornarLista:TObjectList<TclassAtendimento>;
-    function Contar:Integer;
   end;
 
 implementation
@@ -53,13 +51,12 @@ begin
   end;
 
 end;
-function TclassListaAtendimento.Contar:Integer;
-begin
-  Result:= FListaAtendimento.Count;
-end;
 
-procedure TclassListaAtendimento.Remover(atendimento: TclassAtendimento);
+procedure TclassListaAtendimento.Remover(index:Integer);
 begin
-      FListaAtendimento.Remove(atendimento);
+    if index < FListaAtendimento.count then
+      FListaAtendimento.Delete(index)
+    else
+      ShowMessage('Item não Encontrado');
 end;
 end.

@@ -15,9 +15,7 @@ type
     constructor Create;
     procedure Adicionar(atendimento: TclassAtendimento);
     procedure Remover(atendimento: TclassAtendimento);
-
     function RetornarLista:TObjectList<TclassAtendimento>;
-    function Contar:Integer;
   end;
 
 implementation
@@ -52,10 +50,6 @@ begin
     FListaAtendimento.Add(atendimento);
   end;
 
-end;
-function TclassListaAtendimento.Contar:Integer;
-begin
-  Result:= FListaAtendimento.Count;
 end;
 
 procedure TclassListaAtendimento.Remover(atendimento: TclassAtendimento);
