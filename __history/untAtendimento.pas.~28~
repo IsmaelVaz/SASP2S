@@ -59,7 +59,7 @@ type
 
   public
     { Public declarations }
-    tempLstAtendCompleto: TclassListaAtendimento;
+    tempLstAtendCompleto: TObjectList<TclassAtendimento>;
   end;
 
 var
@@ -100,7 +100,7 @@ end;
 procedure TfrmAtendimento.AdicionarHoraFaltante();
 var
   listaAtendimentoReal: TObjectList<TclassAtendimento>;
-  atendimentoReal, proxAtendimento, atendimentoFaltante: TclassAtendimento;
+  atendimentoReal, proxAtendimento: TclassAtendimento;
 begin
   listaAtendimentoReal:= tempListaAtendimento.RetornarLista;
 
@@ -113,16 +113,6 @@ begin
       if timetostr(atendimentoReal.horaFinal) <> (timetostr(proxAtendimento.horaInicial)) then
       begin
           showmessage(timetostr(proxAtendimento.horaInicial));
-          atendimentoFaltante:= TclassAtendimento.Create;
-
-          with atendimentoFaltante do
-          begin
-              dataReferencia:= atendimentoReal.dataReferencia;
-              horaInicial:= atendimentoReal.horaFinal;
-              horaFinal:= proxAtendimento.horaInicial;
-              descricao:='';
-              quemInseriu:= false;
-          end;
       end;
 
     end;

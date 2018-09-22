@@ -59,7 +59,7 @@ type
 
   public
     { Public declarations }
-    tempLstAtendCompleto: TclassListaAtendimento;
+    tempLstAtendCompleto: TObjectList<TclassAtendimento>;
   end;
 
 var
@@ -92,43 +92,54 @@ begin
      end;
 
      tempListaAtendimento.Adicionar(tempAtendimento);
-     AdicionarHoraFaltante;
+     //AdicionarHoraFaltante;
      AtualizarGrid;
      LimparCaixasTexto;
 end;
 
 procedure TfrmAtendimento.AdicionarHoraFaltante();
 var
-  listaAtendimentoReal: TObjectList<TclassAtendimento>;
-  atendimentoReal, proxAtendimento, atendimentoFaltante: TclassAtendimento;
+  horaInicial, horaFinal: TTime;
+  i, plus: integer;
+  tempLstAtend: TObjectList<TclassAtendimento>;
+  tempAtend: TclassAtendimento;
 begin
-  listaAtendimentoReal:= tempListaAtendimento.RetornarLista;
-
-  for atendimentoReal in listaAtendimentoReal do
+  tempLstAtend:= tempListaAtendimento.RetornarLista;
+  if tempLstAtendCompleto <> nil then
   begin
-    if (listaAtendimentoReal.Count > 1) and not(atendimentoReal.Equals(listaAtendimentoReal.Last)) then
+      tempLstAtendCompleto.Destroy;
+  end;
+
+
+  tempLstAtendCompleto:= TObjectList<TclassAtendimento>.Create;
+  for i := 0 to tempLstAtend.Count - 1 do
+  begin
+
+    if (tempLstAtend.Count > 1) and (i < tempLstAtend.Count-1) then
     begin
-      proxAtendimento:= listaAtendimentoReal.Items[listaAtendimentoReal.IndexOf(atendimentoReal)+1];
+      plus:= i+1;
+      horaInicial:= tempLstAtend.Items[i].horaFinal;
+      horaFinal:= tempLstAtend.Items[plus].horaInicial;
+      tempLstAtendCompleto.Add(tempLstAtend.Items[i]);
 
-      if timetostr(atendimentoReal.horaFinal) <> (timetostr(proxAtendimento.horaInicial)) then
+      if horaInicial <> horaFinal then
       begin
-          showmessage(timetostr(proxAtendimento.horaInicial));
-          atendimentoFaltante:= TclassAtendimento.Create;
-
-          with atendimentoFaltante do
-          begin
-              dataReferencia:= atendimentoReal.dataReferencia;
-              horaInicial:= atendimentoReal.horaFinal;
-              horaFinal:= proxAtendimento.horaInicial;
-              descricao:='';
-              quemInseriu:= false;
-          end;
+        tempAtend:= TclassAtendimento.Create;
+          tempAtend.dataReferencia:= strtodate(edtDataRef.Text);
+         tempAtend.horaInicial:= horaInicial;
+         tempAtend.horaFinal:= horaFinal;
+         tempAtend.quemInseriu:= false;
+         tempLstAtendCompleto.Add(tempAtend);
       end;
-
+    end
+    else
+    begin
+       tempLstAtendCompleto.Add(tempLstAtend.Items[i]);
     end;
 
 
   end;
+
 end;
 
 procedure TfrmAtendimento.AtualizarGrid;
