@@ -54,12 +54,12 @@ type
   private
     { Private declarations }
 
-    tempListaAtendimento: TclassListaAtendimento;
+    tempLstAtendCompleto, tempListaAtendimento: TclassListaAtendimento;
     linhaSelecionadaGrid: Integer;
 
   public
     { Public declarations }
-    tempLstAtendCompleto: TclassListaAtendimento;
+
   end;
 
 var
@@ -89,6 +89,7 @@ begin
          horaInicial:= horaInicialRec;
          horaFinal:= horaFinalRec;
          descricao:= descricaoRec;
+         quemInseriu:= true;
      end;
 
      tempListaAtendimento.Adicionar(tempAtendimento);
@@ -103,31 +104,41 @@ var
   atendimentoReal, proxAtendimento, atendimentoFaltante: TclassAtendimento;
 begin
   listaAtendimentoReal:= tempListaAtendimento.RetornarLista;
-
+  tempLstAtendCompleto.Free;
+  tempLstAtendCompleto:= TclassListaAtendimento.Create;
   for atendimentoReal in listaAtendimentoReal do
   begin
     if (listaAtendimentoReal.Count > 1) and not(atendimentoReal.Equals(listaAtendimentoReal.Last)) then
     begin
-      proxAtendimento:= listaAtendimentoReal.Items[listaAtendimentoReal.IndexOf(atendimentoReal)+1];
-
-      if timetostr(atendimentoReal.horaFinal) <> (timetostr(proxAtendimento.horaInicial)) then
+      if not(atendimentoReal.Equals(listaAtendimentoReal.Last)) then
       begin
-          showmessage(timetostr(proxAtendimento.horaInicial));
-          atendimentoFaltante:= TclassAtendimento.Create;
+        proxAtendimento:= listaAtendimentoReal.Items[listaAtendimentoReal.IndexOf(atendimentoReal)+1];
 
-          with atendimentoFaltante do
-          begin
-              dataReferencia:= atendimentoReal.dataReferencia;
-              horaInicial:= atendimentoReal.horaFinal;
-              horaFinal:= proxAtendimento.horaInicial;
-              descricao:='';
-              quemInseriu:= false;
-          end;
+        if timetostr(atendimentoReal.horaFinal) <> (timetostr(proxAtendimento.horaInicial)) then
+        begin
+            atendimentoFaltante:= TclassAtendimento.Create;
+            tempLstAtendCompleto.Adicionar(atendimentoReal);
+            with atendimentoFaltante do
+            begin
+                dataReferencia:= atendimentoReal.dataReferencia;
+                horaInicial:= atendimentoReal.horaFinal;
+                horaFinal:= proxAtendimento.horaInicial;
+                descricao:='';
+                quemInseriu:= false;
+            end;
+            tempLstAtendCompleto.Adicionar(atendimentoFaltante);
+            //atendimentoFaltante.Free;
+        end
+        else
+        begin
+           tempLstAtendCompleto.Adicionar(atendimentoReal);
+        end;
       end;
-
+    end
+    else
+    begin
+       tempLstAtendCompleto.Adicionar(atendimentoReal);
     end;
-
-
   end;
 end;
 
@@ -137,8 +148,8 @@ var
   atendimento: TclassAtendimento;
   i: integer;
 begin
-    listaAtendimento:= tempListaAtendimento.RetornarLista;
-    //listaAtendimento:= tempLstAtendCompleto;
+    //listaAtendimento:= tempListaAtendimento.RetornarLista;
+    listaAtendimento:= tempLstAtendCompleto.RetornarLista;
   if listaAtendimento.Count > 0 then
   begin
     i:= 1;
@@ -209,7 +220,7 @@ end;
 procedure TfrmAtendimento.FormCreate(Sender: TObject);
 begin
   tempListaAtendimento:= TclassListaAtendimento.Create;
-
+  tempLstAtendCompleto:=TclassListaAtendimento.Create;
 
   edtDataRef.Text:= DateToStr(Date);
   linhaSelecionadaGrid:= 0;

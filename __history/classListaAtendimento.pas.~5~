@@ -3,7 +3,7 @@ unit classListaAtendimento;
 interface
 
 uses
-  Classes, classAtendimento, Dialogs, SysUtils, Generics.Collections, Generics.Defaults;
+  Classes, classAtendimento, Dialogs, SysUtils, Generics.Collections;
 
 type
   TclassListaAtendimento = class
@@ -15,7 +15,7 @@ type
     constructor Create;
     procedure Adicionar(atendimento: TclassAtendimento);
     procedure Remover(atendimento: TclassAtendimento);
-    procedure Ordenar();
+
     function RetornarLista:TObjectList<TclassAtendimento>;
     function Contar:Integer;
   end;
@@ -38,7 +38,7 @@ var
   ultimoOid:integer;
 begin
 
-  //atendimento.quemInseriu:= true;
+  atendimento.quemInseriu:= true;
   if FListaAtendimento.Count = 0 then
   begin
     atendimento.oid:= 1;
@@ -52,7 +52,6 @@ begin
     FListaAtendimento.Add(atendimento);
   end;
 
-  Ordenar;
 end;
 function TclassListaAtendimento.Contar:Integer;
 begin
@@ -62,35 +61,5 @@ end;
 procedure TclassListaAtendimento.Remover(atendimento: TclassAtendimento);
 begin
       FListaAtendimento.Remove(atendimento);
-end;
-
-procedure TclassListaAtendimento.Ordenar();
-var
-  Lista: TObjectList<TclassAtendimento>;
-  comparison: TComparison<TclassAtendimento>;
-  delegateComparer: TDelegatedComparer<TclassAtendimento>;
-begin
-  Lista:= FListaAtendimento;
-  // método anonimo para ordenação crescente por ID
-  comparison := function (const P1, P2: TclassAtendimento): Integer
-    begin
-      Result := CompareText(timetostr(P1.horaInicial), timetostr(P2.horaInicial));
-    end;
-
-  // método anonimo para ordenação decrescente por ID
-  { comparison := function (const P1, P2: TPessoa): Integer
-    begin
-      Result := - CompareText(P1.Id, P2.Id);
-    end; }
-
-  // classe que implementa TComparer<T> e facilita o uso.
-  // passe o método de comparação para o delegate!
-  delegateComparer := TDelegatedComparer<TclassAtendimento>.Create(comparison);
-  try
-    // Usando método Sort da nossa lista passando nosso "ordenador"
-    Lista.Sort(delegateComparer);
-  finally
-    delegateComparer.Free;
-  end;
 end;
 end.
