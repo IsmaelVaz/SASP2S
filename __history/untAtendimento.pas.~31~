@@ -247,10 +247,10 @@ begin
     begin
         xmlDoc.FileName:= fileOpenDialog.FileName;
         xmlDoc.Active:= true;
-
+        loadAtendimento:= TclassAtendimento.Create;
         for i := 0 to xmlDoc.DocumentElement.ChildNodes.Count - 1 do
         begin
-           loadAtendimento:= TclassAtendimento.Create;
+
            with loadAtendimento, xmlDoc,xmlDoc.DocumentElement.ChildNodes[i] do
            begin
              horaInicial:=  strtotime(ChildNodes['HoraInicial'].Text);
@@ -258,11 +258,10 @@ begin
              dataReferencia:=  strtodate(ChildNodes['DataReferencia'].Text);
              quemInseriu:=  StrToBool(ChildNodes['QuemInseriu'].Text);
              descricao:=  ChildNodes['Descricao'].Text;
+
            end;
-           //AdicionarHora(loadAtendimento);
-           tempListaAtendimento.Adicionar(loadAtendimento);
-           AdicionarHoraFaltante;
-           AtualizarGrid;
+           AdicionarHora(loadAtendimento);
+
            //loadAtendimento.Destroy;
         end;
     end;
