@@ -51,7 +51,6 @@ type
     procedure LimparCaixasTexto();
     procedure AtualizarGrid;
     function ValidarHora(horaEnviada: String):boolean;
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
 
@@ -227,16 +226,6 @@ begin
   end;
 end;
 
-procedure TfrmAtendimento.FormKeyPress(Sender: TObject; var Key: Char);
-begin
-  ShowMessage('tes');
-  if key = #13 then
-  begin
-     sbtnAdicionarHora.Click;
-  end;
-
-end;
-
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   If Application.MessageBox('Deseja fechar o módulo e descartar as informações?','CUIDADO!',MB_YESNO +
@@ -406,13 +395,7 @@ end;
 // Marcaras de hora
 procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['0'..'9', #8]) then
-  begin
-    if key = #13 then
-    begin
-      sbtnAdicionarHora.Click;
-    end
-  end
+  if not (Key in ['0'..'9', #8]) then abort
   else
   begin
     if not(Key = #8) then
@@ -424,18 +407,11 @@ begin
       end;
     end;
   end;
-
 end;
 
 procedure TfrmAtendimento.edtHoraInicialKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['0'..'9', #8]) then
-  begin
-    if key = #13 then
-    begin
-      sbtnAdicionarHora.Click;
-    end
-  end
+  if not (Key in ['0'..'9', #8]) then abort
   else
   begin
     if not(Key = #8) then
@@ -446,10 +422,6 @@ begin
         edtHoraInicial.SelStart:= Length(edtHoraInicial.Text);
       end;
     end;
-  end;
-  if key = #13 then
-  begin
-     sbtnAdicionarHora.Click;
   end;
 
 end;
