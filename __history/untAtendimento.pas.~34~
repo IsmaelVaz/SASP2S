@@ -31,7 +31,6 @@ type
     memoDescricao: TMemo;
     xmlDoc: TXMLDocument;
     fileOpenDialog: TFileOpenDialog;
-    ckbLancadoHD: TCheckBox;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -107,7 +106,6 @@ begin
                 horaFinal:= proxAtendimento.horaInicial;
                 descricao:='';
                 quemInseriu:= false;
-                lancadoHD:= false;
             end;
             tempLstAtendCompleto.Adicionar(atendimentoFaltante);
             //atendimentoFaltante.Free;
@@ -130,7 +128,6 @@ var
   listaAtendimento: TObjectList<TclassAtendimento>;
   atendimento: TclassAtendimento;
   i: integer;
-  hora: string;
 begin
     //listaAtendimento:= tempListaAtendimento.RetornarLista;
     listaAtendimento:= tempLstAtendCompleto.RetornarLista;
@@ -147,18 +144,11 @@ begin
         Cells[1,i]:= datetostr(atendimento.dataReferencia);
         Cells[2,i]:= TimeToStr(atendimento.horaInicial);
         Cells[3,i]:= TimeToStr(atendimento.horaFinal);
-        hora:=TimeToStr(atendimento.horaFinal - atendimento.horaInicial);
-        Cells[4,i]:= IntToStr((StrToInt(Copy(hora,1,2))*60) + (StrToInt(Copy(hora,4,2))));
-        Cells[5,i]:= atendimento.descricao;
-        case atendimento.lancadoHD of
-          true: Cells[6,i]:= 'SIM';
-          false: Cells[6,i]:= 'NÃO';
-        end;
+        Cells[4,i]:= atendimento.descricao;
         case atendimento.quemInseriu of
-          true: Cells[7,i]:= 'NÃO';
-          false: Cells[7,i]:= 'SIM';
+          true: Cells[5,i]:= 'NÃO';
+          false: Cells[5,i]:= 'SIM';
         end;
-
         i:= i + 1;
       end;
     end;
@@ -206,7 +196,6 @@ begin
   edtHoraFinal.Clear;
   memoDescricao.Lines.Clear;
   edtHoraInicial.SetFocus;
-  ckbLancadoHD.Checked:= false;
 end;
 
 procedure TfrmAtendimento.FormCreate(Sender: TObject);
@@ -219,26 +208,22 @@ begin
 
   with sgridHorarios do
   begin
-    ColCount:= 8;
+    ColCount:= 6;
     RowCount:= 2;
 
     ColWidths[0]:= 50;
     ColWidths[1]:= 100;
     ColWidths[2]:= 100;
     ColWidths[3]:= 100;
-    ColWidths[4]:= 50;
-    ColWidths[5]:= 300;
-    ColWidths[6]:= 70;
-    ColWidths[7]:= 70;
+    ColWidths[4]:= 300;
+    ColWidths[5]:= 70;
 
     Cells[0,0]:= 'Oid';
     Cells[1,0]:= 'Data Referencia';
     Cells[2,0]:= 'Hora Inicial';
     Cells[3,0]:= 'Hora Final';
-    Cells[4,0]:= 'Minutos';
-    Cells[5,0]:= 'Descrição';
-    Cells[6,0]:= 'HD';
-    Cells[7,0]:= 'Falta?';
+    Cells[4,0]:= 'Descrição';
+    Cells[5,0]:= 'Falta?';
   end;
 end;
 
@@ -282,7 +267,6 @@ begin
              horaFinal:=  strtotime(ChildNodes['HoraFinal'].Text);
              dataReferencia:=  strtodate(ChildNodes['DataReferencia'].Text);
              quemInseriu:=  StrToBool(ChildNodes['QuemInseriu'].Text);
-             lancadoHD:= StrToBool(ChildNodes['LancadoHD'].Text);
              descricao:=  ChildNodes['Descricao'].Text;
            end;
            //AdicionarHora(loadAtendimento);
@@ -322,7 +306,6 @@ begin
              horaFinal:= horaFinalRec;
              descricao:= descricaoRec;
              quemInseriu:= true;
-             lancadoHD:= ckbLancadoHD.Checked;
          end;
           AdicionarHora(tempAtendimento);
       end
@@ -378,7 +361,6 @@ begin
          ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
          ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
          ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
-         ixmlAtendimento.AddChild('LancadoHD').Text := BoolToStr(tempAtendimento.lancadoHD);
          ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
 
       end;
@@ -478,25 +460,14 @@ procedure TfrmAtendimento.sgridHorariosDrawCell(Sender: TObject; ACol,
 // Aqui você define algumas cores em RGB, caso não queira utilizar as padrões do Delphi
   clPaleGreen = TColor($009BFF9B);
   clPaleRed =   TColor($009DABF9);
-  clPaleYellow = TColor($00FFD700);
 begin
   if Arow > 0 then
   begin
-    if sgridHorarios.Cells[6,ARow] = 'NÃO' then
-    begin
-       if sgridHorarios.Cells[7,ARow] = 'NÃO'
-          then sgridHorarios.Canvas.Brush.color := clPaleYellow
-       else
-        if sgridHorarios.Cells[7,ARow] = 'SIM'
-          then sgridHorarios.Canvas.Brush.color := clPaleRed;
-    end
+    if sgridHorarios.Cells[5,ARow] = 'NÃO'
+      then sgridHorarios.Canvas.Brush.color := clPaleGreen
     else
-    begin
-        if sgridHorarios.Cells[6,ARow] = 'SIM'
-          then sgridHorarios.Canvas.Brush.color := clPaleGreen;
-    end;
-
-
+    if sgridHorarios.Cells[5,ARow] = 'SIM'
+      then sgridHorarios.Canvas.Brush.color := clPaleRed;
   end;
   sgridHorarios.Canvas.Font.Color:=clblack;
 

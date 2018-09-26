@@ -10,23 +10,27 @@ type
     Fdescricao: String;
     Foid: integer;
     FdataReferencia: TDate;
-    FquemInseriu: boolean;
-    FlancadoHD: boolean;
     procedure SetdataReferencia(const Value: TDate);
     procedure SetDescricao(const Value: String);
     procedure SetHoraFinal(const Value: TTime);
     procedure SetHoraInicial(const Value: TTime);
     procedure SetOid(const Value: integer);
+  private
+    FquemInseriu: boolean;
     procedure SetquemInseriu(const Value: boolean);
-    procedure SetlancadoHD(const Value: boolean);
+
   public
-    property lancadoHD: boolean read FlancadoHD write SetlancadoHD;
     property dataReferencia: TDate read FdataReferencia write SetdataReferencia;
     property horaInicial: TTime read FHoraInicial write SetHoraInicial;
     property horaFinal: TTime read FHoraFinal write SetHoraFinal;
     property descricao: String read Fdescricao write SetDescricao;
     property oid: integer read FOid write SetOid;
     property quemInseriu: boolean read FquemInseriu write SetquemInseriu;
+  private
+  published
+  published
+  protected
+
 end;
 
 implementation
@@ -54,11 +58,6 @@ end;
 procedure TclassAtendimento.SetHoraInicial(const Value: TTime);
 begin
   FHoraInicial := Value;
-end;
-
-procedure TclassAtendimento.SetlancadoHD(const Value: boolean);
-begin
-  FlancadoHD := Value;
 end;
 
 procedure TclassAtendimento.SetOid(const Value: integer);
