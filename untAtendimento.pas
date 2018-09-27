@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc;
+  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc,
+  Menus;
 
 type
   TfrmAtendimento = class(TForm)
@@ -32,6 +33,9 @@ type
     xmlDoc: TXMLDocument;
     fileOpenDialog: TFileOpenDialog;
     ckbLancadoHD: TCheckBox;
+    PopupMenu1: TPopupMenu;
+    Marcarcomolanado1: TMenuItem;
+    Editar1: TMenuItem;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -53,6 +57,9 @@ type
     procedure AtualizarGrid;
     function ValidarHora(horaEnviada: String):boolean;
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y, HitTest: Integer;
+      var MouseActivate: TMouseActivate);
   private
     { Private declarations }
 
@@ -478,14 +485,15 @@ procedure TfrmAtendimento.sgridHorariosDrawCell(Sender: TObject; ACol,
 // Aqui você define algumas cores em RGB, caso não queira utilizar as padrões do Delphi
   clPaleGreen = TColor($009BFF9B);
   clPaleRed =   TColor($009DABF9);
-  clPaleYellow = TColor($00FFD700);
+  clPaleYellow= TColor($00FFD700);
 begin
+
   if Arow > 0 then
   begin
     if sgridHorarios.Cells[6,ARow] = 'NÃO' then
     begin
        if sgridHorarios.Cells[7,ARow] = 'NÃO'
-          then sgridHorarios.Canvas.Brush.color := clPaleYellow
+          then sgridHorarios.Canvas.Brush.color := clYellow
        else
         if sgridHorarios.Cells[7,ARow] = 'SIM'
           then sgridHorarios.Canvas.Brush.color := clPaleRed;
@@ -495,8 +503,15 @@ begin
         if sgridHorarios.Cells[6,ARow] = 'SIM'
           then sgridHorarios.Canvas.Brush.color := clPaleGreen;
     end;
+  end;
 
 
+  if (gdselected in state) then
+  begin
+    if ARow in [sgridHorarios.Selection.Left..sgridHorarios.Selection.Right] then
+    begin
+      sgridHorarios.Canvas.Font.Color := ClRed;;
+    end;
   end;
   sgridHorarios.Canvas.Font.Color:=clblack;
 
@@ -504,10 +519,26 @@ begin
   sgridHorarios.canvas.TextOut(Rect.Left,Rect.Top,sgridHorarios.Cells[ACol,ARow]);
 end;
 
+procedure TfrmAtendimento.sgridHorariosMouseActivate(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
+  var MouseActivate: TMouseActivate);
+  var
+    p: TPoint;
+begin
+  if ssRight in Shift then
+  begin
+    p := Mouse.CursorPos;
+    PopupMenu1.Popup(p.X, p.Y);
+  end;
+end;
+
 //Evento ao selecionar a celula
 procedure TfrmAtendimento.sgridHorariosSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
+  Const
+    clPaleYellow= TColor($00FFD700);
 begin
+  sgridHorarios.Canvas.Font.Color:=clPaleYellow;
   linhaSelecionadaGrid:= ARow;
 end;
 
