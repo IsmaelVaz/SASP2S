@@ -493,22 +493,37 @@ procedure TfrmAtendimento.sgridHorariosDrawCell(Sender: TObject; ACol,
   clPaleGreen = TColor($009BFF9B);
   clPaleRed =   TColor($009DABF9);
   clPaleYellow= TColor($00FFD700);
+  clPaleBlue= TColor($00FFD700);
 begin
+  if Arow = 0 then
+  begin
+     sgridHorarios.Canvas.Brush.color := clWhite;
+     sgridHorarios.Canvas.Font.Color:=clblack;
+  end;
 
   if Arow > 0 then
   begin
     if sgridHorarios.Cells[6,ARow] = 'NÃO' then
     begin
-       if sgridHorarios.Cells[7,ARow] = 'NÃO'
-          then sgridHorarios.Canvas.Brush.color := clYellow
+       if sgridHorarios.Cells[7,ARow] = 'NÃO' then
+       begin
+          sgridHorarios.Canvas.Brush.color := clYellow;
+          sgridHorarios.Canvas.Font.Color:=clblack;
+       end
        else
-        if sgridHorarios.Cells[7,ARow] = 'SIM'
-          then sgridHorarios.Canvas.Brush.color := clPaleRed;
+        if sgridHorarios.Cells[7,ARow] = 'SIM' then
+        begin
+         sgridHorarios.Canvas.Brush.color := clPaleRed;
+         sgridHorarios.Canvas.Font.Color:=clblack;
+        end;
     end
     else
     begin
-        if sgridHorarios.Cells[6,ARow] = 'SIM'
-          then sgridHorarios.Canvas.Brush.color := clPaleGreen;
+        if sgridHorarios.Cells[6,ARow] = 'SIM' then
+          begin
+             sgridHorarios.Canvas.Brush.color := clPaleGreen;
+             sgridHorarios.Canvas.Font.Color:=clblack;
+          end;
     end;
   end;
 
@@ -517,10 +532,10 @@ begin
   begin
     if ARow in [sgridHorarios.Selection.Left..sgridHorarios.Selection.Right] then
     begin
-      sgridHorarios.Canvas.Font.Color := ClRed;;
+      sgridHorarios.Canvas.Brush.color := clPaleBlue;
     end;
   end;
-  sgridHorarios.Canvas.Font.Color:=clblack;
+  //sgridHorarios.Canvas.Font.Color:=clblack;
 
   sgridHorarios.canvas.fillRect(Rect);
   sgridHorarios.canvas.TextOut(Rect.Left,Rect.Top,sgridHorarios.Cells[ACol,ARow]);
@@ -542,10 +557,7 @@ end;
 //Evento ao selecionar a celula
 procedure TfrmAtendimento.sgridHorariosSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
-  Const
-    clPaleYellow= TColor($00FFD700);
 begin
-  sgridHorarios.Canvas.Font.Color:=clPaleYellow;
   linhaSelecionadaGrid:= ARow;
 end;
 
