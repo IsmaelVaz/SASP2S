@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc;
+  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc,
+  Menus;
 
 type
   TfrmAtendimento = class(TForm)
@@ -31,6 +32,10 @@ type
     memoDescricao: TMemo;
     xmlDoc: TXMLDocument;
     fileOpenDialog: TFileOpenDialog;
+    ckbLancadoHD: TCheckBox;
+    PopupMenu1: TPopupMenu;
+    Marcarcomolanado1: TMenuItem;
+    Editar1: TMenuItem;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -46,11 +51,15 @@ type
     procedure sgridHorariosDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
 
-    procedure AdicionarHora(tempAtendimento: TclassAtendimento);
+    procedure AdicionarHora(var tempAtendimento: TclassAtendimento);
     procedure AdicionarHoraFaltante();
     procedure LimparCaixasTexto();
     procedure AtualizarGrid;
     function ValidarHora(horaEnviada: String):boolean;
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y, HitTest: Integer;
+      var MouseActivate: TMouseActivate);
   private
     { Private declarations }
 
@@ -69,7 +78,7 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmAtendimento.AdicionarHora(tempAtendimento: TclassAtendimento);
+procedure TfrmAtendimento.AdicionarHora(var tempAtendimento: TclassAtendimento);
 begin
      tempListaAtendimento.Adicionar(tempAtendimento);
 
@@ -105,6 +114,7 @@ begin
                 horaFinal:= proxAtendimento.horaInicial;
                 descricao:='';
                 quemInseriu:= false;
+                lancadoHD:= false;
             end;
             tempLstAtendCompleto.Adicionar(atendimentoFaltante);
             //atendimentoFaltante.Free;
@@ -127,6 +137,7 @@ var
   listaAtendimento: TObjectList<TclassAtendimento>;
   atendimento: TclassAtendimento;
   i: integer;
+  hora: string;
 begin
     //listaAtendimento:= tempListaAtendimento.RetornarLista;
     listaAtendimento:= tempLstAtendCompleto.RetornarLista;
@@ -143,11 +154,18 @@ begin
         Cells[1,i]:= datetostr(atendimento.dataReferencia);
         Cells[2,i]:= TimeToStr(atendimento.horaInicial);
         Cells[3,i]:= TimeToStr(atendimento.horaFinal);
-        Cells[4,i]:= atendimento.descricao;
-        case atendimento.quemInseriu of
-          true: Cells[5,i]:= 'NÃO';
-          false: Cells[5,i]:= 'SIM';
+        hora:=TimeToStr(atendimento.horaFinal - atendimento.horaInicial);
+        Cells[4,i]:= IntToStr((StrToInt(Copy(hora,1,2))*60) + (StrToInt(Copy(hora,4,2))));
+        Cells[5,i]:= atendimento.descricao;
+        case atendimento.lancadoHD of
+          true: Cells[6,i]:= 'SIM';
+          false: Cells[6,i]:= 'NÃO';
         end;
+        case atendimento.quemInseriu of
+          true: Cells[7,i]:= 'NÃO';
+          false: Cells[7,i]:= 'SIM';
+        end;
+
         i:= i + 1;
       end;
     end;
@@ -195,6 +213,7 @@ begin
   edtHoraFinal.Clear;
   memoDescricao.Lines.Clear;
   edtHoraInicial.SetFocus;
+  ckbLancadoHD.Checked:= false;
 end;
 
 procedure TfrmAtendimento.FormCreate(Sender: TObject);
@@ -207,23 +226,36 @@ begin
 
   with sgridHorarios do
   begin
-    ColCount:= 6;
+    ColCount:= 8;
     RowCount:= 2;
 
     ColWidths[0]:= 50;
     ColWidths[1]:= 100;
     ColWidths[2]:= 100;
     ColWidths[3]:= 100;
-    ColWidths[4]:= 300;
-    ColWidths[5]:= 70;
+    ColWidths[4]:= 50;
+    ColWidths[5]:= 300;
+    ColWidths[6]:= 70;
+    ColWidths[7]:= 70;
 
     Cells[0,0]:= 'Oid';
     Cells[1,0]:= 'Data Referencia';
     Cells[2,0]:= 'Hora Inicial';
     Cells[3,0]:= 'Hora Final';
-    Cells[4,0]:= 'Descrição';
-    Cells[5,0]:= 'Falta?';
+    Cells[4,0]:= 'Minutos';
+    Cells[5,0]:= 'Descrição';
+    Cells[6,0]:= 'HD';
+    Cells[7,0]:= 'Falta?';
   end;
+end;
+
+procedure TfrmAtendimento.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if key = #13 then
+  begin
+     sbtnAdicionarHora.Click;
+  end;
+
 end;
 
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -233,40 +265,6 @@ begin
     Action:= cafree;
     Release;
     frmAtendimento:= nil;
-end;
-
-procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
-var
-  i:integer;
-  loadAtendimento: TclassAtendimento;
-begin
-  If Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
-  begin
-    if fileOpenDialog.Execute then
-    begin
-        xmlDoc.FileName:= fileOpenDialog.FileName;
-        xmlDoc.Active:= true;
-
-        for i := 0 to xmlDoc.DocumentElement.ChildNodes.Count - 1 do
-        begin
-           loadAtendimento:= TclassAtendimento.Create;
-           with loadAtendimento, xmlDoc,xmlDoc.DocumentElement.ChildNodes[i] do
-           begin
-             horaInicial:=  strtotime(ChildNodes['HoraInicial'].Text);
-             horaFinal:=  strtotime(ChildNodes['HoraFinal'].Text);
-             dataReferencia:=  strtodate(ChildNodes['DataReferencia'].Text);
-             quemInseriu:=  StrToBool(ChildNodes['QuemInseriu'].Text);
-             descricao:=  ChildNodes['Descricao'].Text;
-           end;
-           //AdicionarHora(loadAtendimento);
-           tempListaAtendimento.Adicionar(loadAtendimento);
-           AdicionarHoraFaltante;
-           AtualizarGrid;
-           //loadAtendimento.Destroy;
-        end;
-    end;
-  end;
 end;
 
 procedure TfrmAtendimento.sbtnAdicionarHoraClick(Sender: TObject);
@@ -296,6 +294,7 @@ begin
              horaFinal:= horaFinalRec;
              descricao:= descricaoRec;
              quemInseriu:= true;
+             lancadoHD:= ckbLancadoHD.Checked;
          end;
           AdicionarHora(tempAtendimento);
       end
@@ -339,7 +338,7 @@ begin
       xmlDoc.Active:=true;
       xmlDoc.Version:= '1.0';
       xmlDoc.Encoding:= 'UTF-8';
-
+      Objeto:= nil;
       Objeto:= xmlDoc.AddChild('Objeto');
 
       for tempAtendimento in listaAtendimento do
@@ -351,6 +350,7 @@ begin
          ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
          ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
          ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
+         ixmlAtendimento.AddChild('LancadoHD').Text := BoolToStr(tempAtendimento.lancadoHD);
          ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
 
       end;
@@ -361,6 +361,42 @@ begin
   end
   else
     ShowMessage('Não há cadastros para Salvar');
+end;
+
+procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
+var
+  i:integer;
+  loadAtendimento: TclassAtendimento;
+begin
+  If Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+  begin
+    if fileOpenDialog.Execute then
+    begin
+        xmlDoc.FileName:= fileOpenDialog.FileName;
+        xmlDoc.Active:= true;
+        tempListaAtendimento.RetornarLista.Clear;
+        for i := 0 to xmlDoc.DocumentElement.ChildNodes.Count - 1 do
+        begin
+           loadAtendimento:= TclassAtendimento.Create;
+           with loadAtendimento, xmlDoc,xmlDoc.DocumentElement.ChildNodes[i] do
+           begin
+             horaInicial:=  strtotime(ChildNodes['HoraInicial'].Text);
+             horaFinal:=  strtotime(ChildNodes['HoraFinal'].Text);
+             dataReferencia:=  strtodate(ChildNodes['DataReferencia'].Text);
+             quemInseriu:=  StrToBool(ChildNodes['QuemInseriu'].Text);
+             lancadoHD:= StrToBool(ChildNodes['LancadoHD'].Text);
+             descricao:=  ChildNodes['Descricao'].Text;
+           end;
+           AdicionarHora(loadAtendimento);
+           xmlDoc.Active:= false;
+           ///tempListaAtendimento.Adicionar(loadAtendimento);
+           //AdicionarHoraFaltante;
+          // AtualizarGrid;
+           //loadAtendimento.Destroy;
+        end;
+    end;
+  end;
 end;
 
 procedure TfrmAtendimento.sbtnExcluirSelClick(Sender: TObject);
@@ -395,7 +431,13 @@ end;
 // Marcaras de hora
 procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['0'..'9', #8]) then abort
+  if not (Key in ['0'..'9', #8]) then
+  begin
+    if key = #13 then
+    begin
+      sbtnAdicionarHora.Click;
+    end
+  end
   else
   begin
     if not(Key = #8) then
@@ -407,11 +449,18 @@ begin
       end;
     end;
   end;
+
 end;
 
 procedure TfrmAtendimento.edtHoraInicialKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['0'..'9', #8]) then abort
+  if not (Key in ['0'..'9', #8]) then
+  begin
+    if key = #13 then
+    begin
+      sbtnAdicionarHora.Click;
+    end
+  end
   else
   begin
     if not(Key = #8) then
@@ -423,6 +472,10 @@ begin
       end;
     end;
   end;
+  if key = #13 then
+  begin
+     sbtnAdicionarHora.Click;
+  end;
 
 end;
 
@@ -433,14 +486,33 @@ procedure TfrmAtendimento.sgridHorariosDrawCell(Sender: TObject; ACol,
 // Aqui você define algumas cores em RGB, caso não queira utilizar as padrões do Delphi
   clPaleGreen = TColor($009BFF9B);
   clPaleRed =   TColor($009DABF9);
+  clPaleYellow= TColor($00FFD700);
 begin
+
   if Arow > 0 then
   begin
-    if sgridHorarios.Cells[5,ARow] = 'NÃO'
-      then sgridHorarios.Canvas.Brush.color := clPaleGreen
+    if sgridHorarios.Cells[6,ARow] = 'NÃO' then
+    begin
+       if sgridHorarios.Cells[7,ARow] = 'NÃO'
+          then sgridHorarios.Canvas.Brush.color := clYellow
+       else
+        if sgridHorarios.Cells[7,ARow] = 'SIM'
+          then sgridHorarios.Canvas.Brush.color := clPaleRed;
+    end
     else
-    if sgridHorarios.Cells[5,ARow] = 'SIM'
-      then sgridHorarios.Canvas.Brush.color := clPaleRed;
+    begin
+        if sgridHorarios.Cells[6,ARow] = 'SIM'
+          then sgridHorarios.Canvas.Brush.color := clPaleGreen;
+    end;
+  end;
+
+
+  if (gdselected in state) then
+  begin
+    if ARow in [sgridHorarios.Selection.Left..sgridHorarios.Selection.Right] then
+    begin
+      sgridHorarios.Canvas.Font.Color := ClRed;;
+    end;
   end;
   sgridHorarios.Canvas.Font.Color:=clblack;
 
@@ -448,10 +520,26 @@ begin
   sgridHorarios.canvas.TextOut(Rect.Left,Rect.Top,sgridHorarios.Cells[ACol,ARow]);
 end;
 
+procedure TfrmAtendimento.sgridHorariosMouseActivate(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
+  var MouseActivate: TMouseActivate);
+  var
+    p: TPoint;
+begin
+  if ssRight in Shift then
+  begin
+    p := Mouse.CursorPos;
+    PopupMenu1.Popup(p.X, p.Y);
+  end;
+end;
+
 //Evento ao selecionar a celula
 procedure TfrmAtendimento.sgridHorariosSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
+  Const
+    clPaleYellow= TColor($00FFD700);
 begin
+  sgridHorarios.Canvas.Font.Color:=clPaleYellow;
   linhaSelecionadaGrid:= ARow;
 end;
 

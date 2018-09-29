@@ -30,7 +30,6 @@ type
     sbtnExcluirSel: TSpeedButton;
     Label6: TLabel;
     memoDescricao: TMemo;
-    xmlDoc: TXMLDocument;
     fileOpenDialog: TFileOpenDialog;
     ckbLancadoHD: TCheckBox;
     PopupMenu1: TPopupMenu;
@@ -51,7 +50,7 @@ type
     procedure sgridHorariosDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
 
-    procedure AdicionarHora(tempAtendimento: TclassAtendimento);
+    procedure AdicionarHora(var tempAtendimento: TclassAtendimento);
     procedure AdicionarHoraFaltante();
     procedure LimparCaixasTexto();
     procedure AtualizarGrid;
@@ -78,7 +77,7 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmAtendimento.AdicionarHora(tempAtendimento: TclassAtendimento);
+procedure TfrmAtendimento.AdicionarHora(var tempAtendimento: TclassAtendimento);
 begin
      tempListaAtendimento.Adicionar(tempAtendimento);
 
@@ -267,41 +266,6 @@ begin
     frmAtendimento:= nil;
 end;
 
-procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
-var
-  i:integer;
-  loadAtendimento: TclassAtendimento;
-begin
-  If Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
-  begin
-    if fileOpenDialog.Execute then
-    begin
-        xmlDoc.FileName:= fileOpenDialog.FileName;
-        xmlDoc.Active:= true;
-
-        for i := 0 to xmlDoc.DocumentElement.ChildNodes.Count - 1 do
-        begin
-           loadAtendimento:= TclassAtendimento.Create;
-           with loadAtendimento, xmlDoc,xmlDoc.DocumentElement.ChildNodes[i] do
-           begin
-             horaInicial:=  strtotime(ChildNodes['HoraInicial'].Text);
-             horaFinal:=  strtotime(ChildNodes['HoraFinal'].Text);
-             dataReferencia:=  strtodate(ChildNodes['DataReferencia'].Text);
-             quemInseriu:=  StrToBool(ChildNodes['QuemInseriu'].Text);
-             lancadoHD:= StrToBool(ChildNodes['LancadoHD'].Text);
-             descricao:=  ChildNodes['Descricao'].Text;
-           end;
-           //AdicionarHora(loadAtendimento);
-           tempListaAtendimento.Adicionar(loadAtendimento);
-           AdicionarHoraFaltante;
-           AtualizarGrid;
-           //loadAtendimento.Destroy;
-        end;
-    end;
-  end;
-end;
-
 procedure TfrmAtendimento.sbtnAdicionarHoraClick(Sender: TObject);
 var
   tempAtendimento: TclassAtendimento;
@@ -359,8 +323,10 @@ var
   listaAtendimento: TObjectList<TclassAtendimento>;
   tempAtendimento: TclassAtendimento;
   caminhoArquivo: String;
+  xmlDoc: IXMLDocument;
 begin
   listaAtendimento:= tempListaAtendimento.RetornarLista;
+  xmlDoc:= TXMLDocument.Create(nil);
 
   if listaAtendimento.Count > 0 then
   begin
@@ -373,7 +339,7 @@ begin
       xmlDoc.Active:=true;
       xmlDoc.Version:= '1.0';
       xmlDoc.Encoding:= 'UTF-8';
-
+      Objeto:= nil;
       Objeto:= xmlDoc.AddChild('Objeto');
 
       for tempAtendimento in listaAtendimento do
@@ -396,6 +362,47 @@ begin
   end
   else
     ShowMessage('Não há cadastros para Salvar');
+end;
+
+procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
+var
+  i:integer;
+  loadAtendimento: TclassAtendimento;
+  xmlDoc: IXMLDocument;
+begin
+  If Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+  begin
+    if fileOpenDialog.Execute then
+    begin
+        xmlDoc:= TXMLDocument.Create(nil);
+        xmlDoc.FileName:= fileOpenDialog.FileName;
+
+        xmlDoc.Active:= true;
+
+        tempListaAtendimento.RetornarLista.Clear;
+        for i := 0 to xmlDoc.DocumentElement.ChildNodes.Count - 1 do
+        begin
+           loadAtendimento:= TclassAtendimento.Create;
+           with loadAtendimento, xmlDoc,xmlDoc.DocumentElement.ChildNodes[i] do
+           begin
+             horaInicial:=  strtotime(ChildNodes['HoraInicial'].Text);
+             horaFinal:=  strtotime(ChildNodes['HoraFinal'].Text);
+             dataReferencia:=  strtodate(ChildNodes['DataReferencia'].Text);
+             quemInseriu:=  StrToBool(ChildNodes['QuemInseriu'].Text);
+             lancadoHD:= StrToBool(ChildNodes['LancadoHD'].Text);
+             descricao:=  ChildNodes['Descricao'].Text;
+           end;
+           AdicionarHora(loadAtendimento);
+
+           ///tempListaAtendimento.Adicionar(loadAtendimento);
+           //AdicionarHoraFaltante;
+          // AtualizarGrid;
+           //loadAtendimento.Destroy;
+        end;
+        if xmlDoc.Active then xmlDoc.Active:= false;
+    end;
+  end;
 end;
 
 procedure TfrmAtendimento.sbtnExcluirSelClick(Sender: TObject);
