@@ -55,10 +55,10 @@ type
     procedure LimparCaixasTexto();
     procedure AtualizarGrid;
     function ValidarHora(horaEnviada: String):boolean;
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
+   // procedure FormKeyPress(Sender: TObject; var Key: Char);
+   { procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y, HitTest: Integer;
-      var MouseActivate: TMouseActivate);
+      var MouseActivate: TMouseActivate); }
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
@@ -255,7 +255,7 @@ begin
   if (Shift = [ssShift]) and (key = vk_f7) then edtDataRef.ReadOnly:=false;
 
 end;
-
+{
 procedure TfrmAtendimento.FormKeyPress(Sender: TObject; var Key: Char);
 begin
   if key = #13 then
@@ -264,7 +264,7 @@ begin
   end;
 
 end;
-
+  }
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   If Application.MessageBox('Deseja fechar o módulo e descartar as informações?','CUIDADO!',MB_YESNO +
@@ -548,7 +548,7 @@ begin
   sgridHorarios.canvas.fillRect(Rect);
   sgridHorarios.canvas.TextOut(Rect.Left,Rect.Top,sgridHorarios.Cells[ACol,ARow]);
 end;
-
+{
 procedure TfrmAtendimento.sgridHorariosMouseActivate(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
   var MouseActivate: TMouseActivate);
@@ -561,7 +561,7 @@ begin
     PopupMenu1.Popup(p.X, p.Y);
   end;
 end;
-
+     }
 //Evento ao selecionar a celula
 procedure TfrmAtendimento.sgridHorariosSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
