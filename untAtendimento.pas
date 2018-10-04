@@ -59,6 +59,7 @@ type
     procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y, HitTest: Integer;
       var MouseActivate: TMouseActivate);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
 
@@ -246,6 +247,13 @@ begin
     Cells[6,0]:= 'HD';
     Cells[7,0]:= 'Falta?';
   end;
+end;
+
+procedure TfrmAtendimento.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Shift = [ssShift]) and (key = vk_f7) then edtDataRef.ReadOnly:=false;
+
 end;
 
 procedure TfrmAtendimento.FormKeyPress(Sender: TObject; var Key: Char);
