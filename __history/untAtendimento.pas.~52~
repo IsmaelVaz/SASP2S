@@ -30,7 +30,6 @@ type
     sbtnExcluirSel: TSpeedButton;
     Label6: TLabel;
     memoDescricao: TMemo;
-
     fileOpenDialog: TFileOpenDialog;
     ckbLancadoHD: TCheckBox;
     PopupMenu1: TPopupMenu;
@@ -56,10 +55,11 @@ type
     procedure LimparCaixasTexto();
     procedure AtualizarGrid;
     function ValidarHora(horaEnviada: String):boolean;
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
+   // procedure FormKeyPress(Sender: TObject; var Key: Char);
+   { procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y, HitTest: Integer;
-      var MouseActivate: TMouseActivate);
+      var MouseActivate: TMouseActivate); }
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
 
@@ -95,6 +95,7 @@ begin
   listaAtendimentoReal:= tempListaAtendimento.RetornarLista;
   tempLstAtendCompleto.Free;
   tempLstAtendCompleto:= TclassListaAtendimento.Create;
+
   for atendimentoReal in listaAtendimentoReal do
   begin
     if (listaAtendimentoReal.Count > 1) and not(atendimentoReal.Equals(listaAtendimentoReal.Last)) then
@@ -117,7 +118,7 @@ begin
                 lancadoHD:= false;
             end;
             tempLstAtendCompleto.Adicionar(atendimentoFaltante);
-            //atendimentoFaltante.Free;
+            atendimentoFaltante.Free;
         end
         else
         begin
@@ -249,12 +250,10 @@ begin
   end;
 end;
 
-procedure TfrmAtendimento.FormKeyPress(Sender: TObject; var Key: Char);
+procedure TfrmAtendimento.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
 begin
-  if key = #13 then
-  begin
-     sbtnAdicionarHora.Click;
-  end;
+  if (Shift = [ssShift]) and (key = vk_f7) then edtDataRef.ReadOnly:=false;
 
 end;
 
@@ -324,8 +323,10 @@ var
   listaAtendimento: TObjectList<TclassAtendimento>;
   tempAtendimento: TclassAtendimento;
   caminhoArquivo: String;
+  xmlDoc: IXMLDocument;
 begin
   listaAtendimento:= tempListaAtendimento.RetornarLista;
+  xmlDoc:= TXMLDocument.Create(nil);
 
   if listaAtendimento.Count > 0 then
   begin
@@ -367,15 +368,28 @@ procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
 var
   i:integer;
   loadAtendimento: TclassAtendimento;
+  xmlDoc: IXMLDocument;
+  retorno: ShortString;
 begin
-  If Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+
+  if tempListaAtendimento.RetornarLista.Count > 0 then
+  begin
+     retorno:= Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2);
+  end
+  else
+  begin
+    retorno:= IDYES;
+  end;
+
+  If retorno = IDYES Then
   begin
     if fileOpenDialog.Execute then
     begin
+        xmlDoc:= TXMLDocument.Create(nil);
         xmlDoc.FileName:= fileOpenDialog.FileName;
 
-        if not xmlDoc.Active then xmlDoc.Active:= true;
+        xmlDoc.Active:= true;
 
         tempListaAtendimento.RetornarLista.Clear;
         for i := 0 to xmlDoc.DocumentElement.ChildNodes.Count - 1 do
@@ -391,11 +405,6 @@ begin
              descricao:=  ChildNodes['Descricao'].Text;
            end;
            AdicionarHora(loadAtendimento);
-
-           ///tempListaAtendimento.Adicionar(loadAtendimento);
-           //AdicionarHoraFaltante;
-          // AtualizarGrid;
-           //loadAtendimento.Destroy;
         end;
         if xmlDoc.Active then xmlDoc.Active:= false;
     end;
@@ -490,22 +499,37 @@ procedure TfrmAtendimento.sgridHorariosDrawCell(Sender: TObject; ACol,
   clPaleGreen = TColor($009BFF9B);
   clPaleRed =   TColor($009DABF9);
   clPaleYellow= TColor($00FFD700);
+  clPaleBlue= TColor($00FFD700);
 begin
+  if Arow = 0 then
+  begin
+     sgridHorarios.Canvas.Brush.color := clWhite;
+     sgridHorarios.Canvas.Font.Color:=clblack;
+  end;
 
   if Arow > 0 then
   begin
     if sgridHorarios.Cells[6,ARow] = 'NÃO' then
     begin
-       if sgridHorarios.Cells[7,ARow] = 'NÃO'
-          then sgridHorarios.Canvas.Brush.color := clYellow
+       if sgridHorarios.Cells[7,ARow] = 'NÃO' then
+       begin
+          sgridHorarios.Canvas.Brush.color := clYellow;
+          sgridHorarios.Canvas.Font.Color:=clblack;
+       end
        else
-        if sgridHorarios.Cells[7,ARow] = 'SIM'
-          then sgridHorarios.Canvas.Brush.color := clPaleRed;
+        if sgridHorarios.Cells[7,ARow] = 'SIM' then
+        begin
+         sgridHorarios.Canvas.Brush.color := clPaleRed;
+         sgridHorarios.Canvas.Font.Color:=clblack;
+        end;
     end
     else
     begin
-        if sgridHorarios.Cells[6,ARow] = 'SIM'
-          then sgridHorarios.Canvas.Brush.color := clPaleGreen;
+        if sgridHorarios.Cells[6,ARow] = 'SIM' then
+          begin
+             sgridHorarios.Canvas.Brush.color := clPaleGreen;
+             sgridHorarios.Canvas.Font.Color:=clblack;
+          end;
     end;
   end;
 
@@ -514,15 +538,15 @@ begin
   begin
     if ARow in [sgridHorarios.Selection.Left..sgridHorarios.Selection.Right] then
     begin
-      sgridHorarios.Canvas.Font.Color := ClRed;;
+      sgridHorarios.Canvas.Brush.color := clPaleBlue;
     end;
   end;
-  sgridHorarios.Canvas.Font.Color:=clblack;
+  //sgridHorarios.Canvas.Font.Color:=clblack;
 
   sgridHorarios.canvas.fillRect(Rect);
   sgridHorarios.canvas.TextOut(Rect.Left,Rect.Top,sgridHorarios.Cells[ACol,ARow]);
 end;
-
+{
 procedure TfrmAtendimento.sgridHorariosMouseActivate(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
   var MouseActivate: TMouseActivate);
@@ -535,14 +559,11 @@ begin
     PopupMenu1.Popup(p.X, p.Y);
   end;
 end;
-
+     }
 //Evento ao selecionar a celula
 procedure TfrmAtendimento.sgridHorariosSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
-  Const
-    clPaleYellow= TColor($00FFD700);
 begin
-  sgridHorarios.Canvas.Font.Color:=clPaleYellow;
   linhaSelecionadaGrid:= ARow;
 end;
 

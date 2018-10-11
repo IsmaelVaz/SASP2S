@@ -369,20 +369,20 @@ var
   i:integer;
   loadAtendimento: TclassAtendimento;
   xmlDoc: IXMLDocument;
-  retorno: ShortString;
+  retorno: boolean;
 begin
-
+  retorno:= false;
   if tempListaAtendimento.RetornarLista.Count > 0 then
   begin
-     retorno:= Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2);
+     if Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES then retorno := true;
   end
   else
   begin
-    retorno:= IDYES;
+    retorno:= true;
   end;
 
-  If retorno = IDYES Then
+  If retorno = true Then
   begin
     if fileOpenDialog.Execute then
     begin
