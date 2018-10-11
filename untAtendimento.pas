@@ -95,6 +95,7 @@ begin
   listaAtendimentoReal:= tempListaAtendimento.RetornarLista;
   tempLstAtendCompleto.Free;
   tempLstAtendCompleto:= TclassListaAtendimento.Create;
+
   for atendimentoReal in listaAtendimentoReal do
   begin
     if (listaAtendimentoReal.Count > 1) and not(atendimentoReal.Equals(listaAtendimentoReal.Last)) then
@@ -117,7 +118,7 @@ begin
                 lancadoHD:= false;
             end;
             tempLstAtendCompleto.Adicionar(atendimentoFaltante);
-            //atendimentoFaltante.Free;
+            atendimentoFaltante.Free;
         end
         else
         begin
@@ -255,16 +256,7 @@ begin
   if (Shift = [ssShift]) and (key = vk_f7) then edtDataRef.ReadOnly:=false;
 
 end;
-{
-procedure TfrmAtendimento.FormKeyPress(Sender: TObject; var Key: Char);
-begin
-  if key = #13 then
-  begin
-     sbtnAdicionarHora.Click;
-  end;
 
-end;
-  }
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   If Application.MessageBox('Deseja fechar o módulo e descartar as informações?','CUIDADO!',MB_YESNO +
@@ -377,9 +369,20 @@ var
   i:integer;
   loadAtendimento: TclassAtendimento;
   xmlDoc: IXMLDocument;
+  retorno: ShortString;
 begin
-  If Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+
+  if tempListaAtendimento.RetornarLista.Count > 0 then
+  begin
+     retorno:= Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2);
+  end
+  else
+  begin
+    retorno:= IDYES;
+  end;
+
+  If retorno = IDYES Then
   begin
     if fileOpenDialog.Execute then
     begin
@@ -402,11 +405,6 @@ begin
              descricao:=  ChildNodes['Descricao'].Text;
            end;
            AdicionarHora(loadAtendimento);
-
-           ///tempListaAtendimento.Adicionar(loadAtendimento);
-           //AdicionarHoraFaltante;
-          // AtualizarGrid;
-           //loadAtendimento.Destroy;
         end;
         if xmlDoc.Active then xmlDoc.Active:= false;
     end;
