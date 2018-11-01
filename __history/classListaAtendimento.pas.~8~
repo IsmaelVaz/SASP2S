@@ -36,37 +36,35 @@ end;
 
 procedure TclassListaAtendimento.LancarID;
 var
-  tempAtendimento: TclassAtendimento;
+  tempAtendimento: classAtendimento;
   idAux:integer;
 begin
   idAux:= 1;
   for tempAtendimento in FListaAtendimento do
   begin
-     tempAtendimento.oid:= idAux;
-     idAux:= idAux+1;
+     tempAtendimento.oi
   end;
 end;
 procedure TclassListaAtendimento.Adicionar(atendimento: TclassAtendimento);
 var
   ultimoOid:integer;
 begin
-  // Ordenar;
+   Ordenar;
   //atendimento.quemInseriu:= true;
-  {if FListaAtendimento.Count = 0 then
+  if FListaAtendimento.Count = 0 then
   begin
     atendimento.oid:= 1;
     FListaAtendimento.Add(atendimento);
-  end }
+  end
 
- // else
- // begin
-    //ultimoOid:= FListaAtendimento.Last.oid + 1;
-   // atendimento.oid:=ultimoOid;
+  else
+  begin
+    ultimoOid:= FListaAtendimento.Last.oid + 1;
+    atendimento.oid:=ultimoOid;
     FListaAtendimento.Add(atendimento);
- // end;
+  end;
 
    Ordenar;
-   LancarID;
 end;
 function TclassListaAtendimento.Contar:Integer;
 begin

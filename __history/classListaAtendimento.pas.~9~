@@ -52,18 +52,18 @@ var
 begin
   // Ordenar;
   //atendimento.quemInseriu:= true;
-  {if FListaAtendimento.Count = 0 then
-  begin
+  if FListaAtendimento.Count = 0 then
+ { begin
     atendimento.oid:= 1;
     FListaAtendimento.Add(atendimento);
   end }
 
- // else
- // begin
+  else
+  begin
     //ultimoOid:= FListaAtendimento.Last.oid + 1;
-   // atendimento.oid:=ultimoOid;
+    atendimento.oid:=ultimoOid;
     FListaAtendimento.Add(atendimento);
- // end;
+  end;
 
    Ordenar;
    LancarID;

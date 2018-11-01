@@ -55,11 +55,18 @@ type
     procedure LimparCaixasTexto();
     procedure AtualizarGrid;
     function ValidarHora(horaEnviada: String):boolean;
+    function VerificarHoraExistente(tempAtendimento: TclassAtendimento):Boolean;
    // procedure FormKeyPress(Sender: TObject; var Key: Char);
    { procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y, HitTest: Integer;
       var MouseActivate: TMouseActivate); }
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y, HitTest: Integer;
+      var MouseActivate: TMouseActivate);
+    procedure sgridHorariosMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Marcarcomolanado1Click(Sender: TObject);
   private
     { Private declarations }
 
@@ -107,6 +114,7 @@ begin
         if timetostr(atendimentoReal.horaFinal) <> (timetostr(proxAtendimento.horaInicial)) then
         begin
             atendimentoFaltante:= TclassAtendimento.Create;
+            atendimentoReal.oidReal:= atendimentoReal.oid;
             tempLstAtendCompleto.Adicionar(atendimentoReal);
             with atendimentoFaltante do
             begin
@@ -117,17 +125,21 @@ begin
                 quemInseriu:= false;
                 lancadoHD:= false;
             end;
+
             tempLstAtendCompleto.Adicionar(atendimentoFaltante);
             atendimentoFaltante.Free;
+
         end
         else
         begin
+           atendimentoReal.oidReal:= atendimentoReal.oid;
            tempLstAtendCompleto.Adicionar(atendimentoReal);
         end;
       end;
     end
     else
     begin
+       atendimentoReal.oidReal:= atendimentoReal.oid;
        tempLstAtendCompleto.Adicionar(atendimentoReal);
     end;
   end;
@@ -166,7 +178,7 @@ begin
           true: Cells[7,i]:= 'NÃO';
           false: Cells[7,i]:= 'SIM';
         end;
-
+        Cells[8,i]:= IntToStr(atendimento.oidReal);
         i:= i + 1;
       end;
     end;
@@ -208,6 +220,11 @@ begin
 
 end;
 
+function TfrmAtendimento.VerificarHoraExistente(tempAtendimento: TclassAtendimento):Boolean;
+begin
+  VerificarHoraExistente:=true;
+end;
+
 procedure TfrmAtendimento.LimparCaixasTexto();
 begin
   edtHoraInicial.Clear;
@@ -215,6 +232,40 @@ begin
   memoDescricao.Lines.Clear;
   edtHoraInicial.SetFocus;
   ckbLancadoHD.Checked:= false;
+end;
+
+procedure TfrmAtendimento.Marcarcomolanado1Click(Sender: TObject);
+var
+  oidAtendimentoSelecionado: Integer;
+  atendimentoSelecionado: TclassAtendimento;
+  listaAtendimento: TObjectList<TclassAtendimento>;
+  tempQuemLancou: String;
+begin
+  if linhaSelecionadaGrid <> 0 then
+  begin
+    oidAtendimentoSelecionado:= StrToInt(sgridHorarios.Cells[8, linhaSelecionadaGrid]);
+    tempQuemLancou:= sgridHorarios.Cells[0, linhaSelecionadaGrid];
+
+    if oidAtendimentoSelecionado <> 0 then
+    begin
+        listaAtendimento:= tempListaAtendimento.RetornarLista;
+        for atendimentoSelecionado in listaAtendimento do
+        begin
+          if atendimentoSelecionado.oid = oidAtendimentoSelecionado then
+          begin
+            atendimentoSelecionado.lancadoHD:= true;
+            AdicionarHoraFaltante;
+          end;
+        end;
+        AtualizarGrid;
+    end
+    else
+    begin
+       ShowMessage('Selecione um Registro!');
+    end;
+  end
+  else
+    ShowMessage('Selecione um Registro!');
 end;
 
 procedure TfrmAtendimento.FormCreate(Sender: TObject);
@@ -227,7 +278,7 @@ begin
 
   with sgridHorarios do
   begin
-    ColCount:= 8;
+    ColCount:= 9;
     RowCount:= 2;
 
     ColWidths[0]:= 50;
@@ -238,6 +289,7 @@ begin
     ColWidths[5]:= 300;
     ColWidths[6]:= 70;
     ColWidths[7]:= 70;
+    ColWidths[8]:= 70;
 
     Cells[0,0]:= 'Oid';
     Cells[1,0]:= 'Data Referencia';
@@ -247,6 +299,8 @@ begin
     Cells[5,0]:= 'Descrição';
     Cells[6,0]:= 'HD';
     Cells[7,0]:= 'Falta?';
+    Cells[8,0]:= 'Id';
+
   end;
 end;
 
@@ -295,7 +349,10 @@ begin
              quemInseriu:= true;
              lancadoHD:= ckbLancadoHD.Checked;
          end;
-          AdicionarHora(tempAtendimento);
+          if VerificarHoraExistente(tempAtendimento) then
+          begin
+            AdicionarHora(tempAtendimento);
+          end;
       end
       else
       begin
@@ -369,20 +426,20 @@ var
   i:integer;
   loadAtendimento: TclassAtendimento;
   xmlDoc: IXMLDocument;
-  retorno: ShortString;
+  retorno: boolean;
 begin
-
+  retorno:= false;
   if tempListaAtendimento.RetornarLista.Count > 0 then
   begin
-     retorno:= Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2);
+     if Application.MessageBox('Deseja descartar os Registros já cadastrados?','Atenção!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES then retorno := true;
   end
   else
   begin
-    retorno:= IDYES;
+    retorno:= true;
   end;
 
-  If retorno = IDYES Then
+  If retorno = true Then
   begin
     if fileOpenDialog.Execute then
     begin
@@ -416,24 +473,39 @@ var
   oidAtendimentoSelecionado: Integer;
   atendimentoSelecionado: TclassAtendimento;
   listaAtendimento: TObjectList<TclassAtendimento>;
+  tempQuemLancou: String;
 begin
   if linhaSelecionadaGrid <> 0 then
   begin
-    oidAtendimentoSelecionado:= StrToInt(sgridHorarios.Cells[0, linhaSelecionadaGrid]);
-    If Application.MessageBox('Deseja Excluir o Regitro selecionado ?','Atenção!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
-    begin
-      listaAtendimento:= tempListaAtendimento.RetornarLista;
+    oidAtendimentoSelecionado:= StrToInt(sgridHorarios.Cells[8, linhaSelecionadaGrid]);
+    tempQuemLancou:= sgridHorarios.Cells[0, linhaSelecionadaGrid];
 
-      for atendimentoSelecionado in listaAtendimento do
+    if oidAtendimentoSelecionado <> 0 then
+    begin
+      If Application.MessageBox('Deseja Excluir o Regitro selecionado ?','Atenção!',MB_YESNO +
+                             MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
       begin
-        if atendimentoSelecionado.oid = oidAtendimentoSelecionado then
+        listaAtendimento:= tempListaAtendimento.RetornarLista;
+        try
         begin
-          tempListaAtendimento.Remover(atendimentoSelecionado);
-          AdicionarHoraFaltante;
+            for atendimentoSelecionado in listaAtendimento do
+            begin
+              if atendimentoSelecionado.oid = oidAtendimentoSelecionado then
+              begin
+                tempListaAtendimento.Remover(atendimentoSelecionado);
+                AdicionarHoraFaltante;
+              end;
+            end;
+            AtualizarGrid;
+        end;
+        except
+            ShowMessage('Não foi possível excluir o registro!');
         end;
       end;
-      AtualizarGrid;
+    end
+    else
+    begin
+       ShowMessage('Não foi possível excluir o registro!');
     end;
   end
   else
@@ -533,33 +605,50 @@ begin
     end;
   end;
 
-
-  if (gdselected in state) then
+  if (ARow = linhaSelecionadaGrid) then
+  begin
+      sgridHorarios.Canvas.Brush.color := clPaleBlue;
+  end;
+ { if (gdselected in state) then
   begin
     if ARow in [sgridHorarios.Selection.Left..sgridHorarios.Selection.Right] then
     begin
       sgridHorarios.Canvas.Brush.color := clPaleBlue;
     end;
-  end;
+  end; }
   //sgridHorarios.Canvas.Font.Color:=clblack;
 
   sgridHorarios.canvas.fillRect(Rect);
   sgridHorarios.canvas.TextOut(Rect.Left,Rect.Top,sgridHorarios.Cells[ACol,ARow]);
 end;
-{
 procedure TfrmAtendimento.sgridHorariosMouseActivate(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
   var MouseActivate: TMouseActivate);
   var
     p: TPoint;
 begin
-  if ssRight in Shift then
+ { if ssRight in Shift then
   begin
     p := Mouse.CursorPos;
     PopupMenu1.Popup(p.X, p.Y);
   end;
+  }
+
 end;
-     }
+
+procedure TfrmAtendimento.sgridHorariosMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  var
+    p: TPoint;
+begin
+if ssRight in Shift then
+  begin
+  p := Mouse.CursorPos;
+    PopupMenu1.Popup(p.X, p.Y);
+  end;
+
+end;
+
 //Evento ao selecionar a celula
 procedure TfrmAtendimento.sgridHorariosSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);

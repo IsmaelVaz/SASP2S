@@ -12,8 +12,6 @@ type
     FdataReferencia: TDate;
     FquemInseriu: boolean;
     FlancadoHD: boolean;
-    FoidReal: integer;
-
     procedure SetdataReferencia(const Value: TDate);
     procedure SetDescricao(const Value: String);
     procedure SetHoraFinal(const Value: TTime);
@@ -21,7 +19,6 @@ type
     procedure SetOid(const Value: integer);
     procedure SetquemInseriu(const Value: boolean);
     procedure SetlancadoHD(const Value: boolean);
-    procedure SetoidReal(const Value: integer);
   public
     property lancadoHD: boolean read FlancadoHD write SetlancadoHD;
     property dataReferencia: TDate read FdataReferencia write SetdataReferencia;
@@ -30,7 +27,6 @@ type
     property descricao: String read Fdescricao write SetDescricao;
     property oid: integer read FOid write SetOid;
     property quemInseriu: boolean read FquemInseriu write SetquemInseriu;
-    property oidReal: integer read FoidReal write SetoidReal;
 end;
 
 implementation
@@ -68,11 +64,6 @@ end;
 procedure TclassAtendimento.SetOid(const Value: integer);
 begin
   FOid := Value;
-end;
-
-procedure TclassAtendimento.SetoidReal(const Value: integer);
-begin
-  FoidReal := Value;
 end;
 
 procedure TclassAtendimento.SetquemInseriu(const Value: boolean);
