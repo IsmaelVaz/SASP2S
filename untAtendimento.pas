@@ -107,7 +107,7 @@ begin
   listaAtendimentoReal:= tempListaAtendimento.RetornarLista;
   tempLstAtendCompleto.Free;
   tempLstAtendCompleto:= TclassListaAtendimento.Create;
-
+ // atendimentoFaltante:= TclassAtendimento.Create;
   for atendimentoReal in listaAtendimentoReal do
   begin
     atendimentoReal.oidReal:= atendimentoReal.oid;
@@ -134,7 +134,7 @@ begin
             end;
 
             tempLstAtendCompleto.Adicionar(atendimentoFaltante);
-            atendimentoFaltante.Destroy;
+            //atendimentoFaltante.Destroy;
 
         end
         else
@@ -318,7 +318,7 @@ begin
         listaAtendimento:= tempListaAtendimento.RetornarLista;
         for atendimentoSelecionado in listaAtendimento do
         begin
-          if atendimentoSelecionado.oid = oidAtendimentoSelecionado then
+          if atendimentoSelecionado.oidReal = oidAtendimentoSelecionado then
           begin
             atendimentoSelecionado.lancadoHD:= true;
             AdicionarHoraFaltante;
@@ -564,14 +564,14 @@ var
   oidAtendimentoSelecionado: Integer;
   atendimentoSelecionado: TclassAtendimento;
   listaAtendimento: TObjectList<TclassAtendimento>;
-  tempQuemLancou: String;
+  tempFalta: String;
 begin
   if linhaSelecionadaGrid <> 0 then
   begin
     oidAtendimentoSelecionado:= StrToInt(sgridHorarios.Cells[8, linhaSelecionadaGrid]);
-    tempQuemLancou:= sgridHorarios.Cells[0, linhaSelecionadaGrid];
+    tempFalta:= sgridHorarios.Cells[7, linhaSelecionadaGrid];
 
-    if oidAtendimentoSelecionado <> 0 then
+    if (oidAtendimentoSelecionado <> 0) and (AnsiCompareText(tempFalta, 'SIM') <> 0) then
     begin
       If Application.MessageBox('Deseja Excluir o Regitro selecionado ?','Atenção!',MB_YESNO +
                              MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
@@ -581,7 +581,7 @@ begin
         begin
             for atendimentoSelecionado in listaAtendimento do
             begin
-              if atendimentoSelecionado.oid = oidAtendimentoSelecionado then
+              if atendimentoSelecionado.oidReal = oidAtendimentoSelecionado then
               begin
                 tempListaAtendimento.Remover(atendimentoSelecionado);
                 AdicionarHoraFaltante;
