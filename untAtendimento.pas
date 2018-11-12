@@ -71,6 +71,7 @@ type
     procedure Marcarcomolanado1Click(Sender: TObject);
     procedure Editar1Click(Sender: TObject);
     procedure sbtnCancelarClick(Sender: TObject);
+    procedure edtHoraFinalEnter(Sender: TObject);
   private
     { Private declarations }
 
@@ -223,6 +224,10 @@ begin
         Cells[2,1]:= '';
         Cells[3,1]:= '';
         Cells[4,1]:= '';
+        Cells[5,1]:= '';
+        Cells[6,1]:= '';
+        Cells[7,1]:= '';
+        Cells[8,1]:= '';
 
       end;
   end;
@@ -604,6 +609,14 @@ begin
 end;
 
 // Marcaras de hora
+procedure TfrmAtendimento.edtHoraFinalEnter(Sender: TObject);
+begin
+  edtHoraFinal.Text:= Copy(timetostr(time()), 0, 5);
+  edtHoraFinal.SelStart := Length(edtHoraFinal.Text );
+  edtHoraFinal.SelectAll;
+
+end;
+
 procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
 begin
   if not (Key in ['0'..'9', #8]) then
