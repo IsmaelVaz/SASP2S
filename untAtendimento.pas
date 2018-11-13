@@ -36,6 +36,7 @@ type
     Marcarcomolanado1: TMenuItem;
     Editar1: TMenuItem;
     sbtnCancelar: TSpeedButton;
+    ckbHoraAuto: TCheckBox;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -611,10 +612,12 @@ end;
 // Marcaras de hora
 procedure TfrmAtendimento.edtHoraFinalEnter(Sender: TObject);
 begin
-  edtHoraFinal.Text:= Copy(timetostr(time()), 0, 5);
-  edtHoraFinal.SelStart := Length(edtHoraFinal.Text );
-  edtHoraFinal.SelectAll;
-
+  if ckbHoraAuto.Checked then
+  begin
+    edtHoraFinal.Text:= Copy(timetostr(time()), 0, 5);
+    edtHoraFinal.SelStart := Length(edtHoraFinal.Text );
+    edtHoraFinal.SelectAll;
+  end;
 end;
 
 procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
