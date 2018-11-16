@@ -73,6 +73,7 @@ type
     procedure Editar1Click(Sender: TObject);
     procedure sbtnCancelarClick(Sender: TObject);
     procedure edtHoraFinalEnter(Sender: TObject);
+    procedure ckbHoraAutoClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -174,6 +175,25 @@ begin
     sbtnCancelar.Click;
     AdicionarHoraFaltante;
     AtualizarGrid;
+end;
+
+procedure TfrmAtendimento.ckbHoraAutoClick(Sender: TObject);
+begin
+  if ckbHoraAuto.Checked = true then
+  begin
+     edtHoraInicial.TabOrder:= 1;
+     memoDescricao.TabOrder:= 2;
+     edtHoraFinal.TabOrder:= 3;
+     ckbLancadoHD.TabOrder:= 4;
+
+  end;
+  if ckbHoraAuto.Checked = false then
+  begin
+     edtHoraInicial.TabOrder:= 1;
+     edtHoraFinal.TabOrder:= 2;
+     memoDescricao.TabOrder:= 3;
+     ckbLancadoHD.TabOrder:= 4;
+  end;
 end;
 
 procedure TfrmAtendimento.AtualizarGrid;
@@ -382,7 +402,17 @@ procedure TfrmAtendimento.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Shift = [ssShift]) and (key = vk_f7) then edtDataRef.ReadOnly:=false;
+  if (Shift= [ssShift]) and (key = VK_DELETE) then
+  begin
+     If Application.MessageBox('Deseja excluir todos os registros?','CUIDADO!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+     begin
+        tempListaAtendimento.RetornarLista.Clear;
+        AdicionarHoraFaltante;
+        AtualizarGrid;
+     end;
 
+  end;
 end;
 
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
