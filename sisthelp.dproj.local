@@ -8,5 +8,8 @@
     <Transaction>2018/07/26 21:01:10.827.dfm,C:\Users\ISMAEL\Documents\RAD Studio\Projects\SISTHELPP2S\Unit2.dfm=C:\Users\ISMAEL\Documents\RAD Studio\Projects\SISTHELPP2S\untAtendimento.dfm</Transaction>
     <Transaction>2018/07/28 23:03:40.952.pas,C:\Users\ISMAEL\Documents\RAD Studio\Projects\SISTHELPP2S\Unit1.pas=C:\Users\ISMAEL\Documents\RAD Studio\Projects\SISTHELPP2S\classAtendimento.pas</Transaction>
     <Transaction>2018/07/28 23:31:03.439.pas,C:\Users\ISMAEL\Documents\RAD Studio\Projects\SISTHELPP2S\Unit1.pas=C:\Users\ISMAEL\Documents\RAD Studio\Projects\SISTHELPP2S\classListaAtendimento.pas</Transaction>
+    <Transaction>2018/11/16 11:30:30.043.pas,C:\Users\ISMAEL\Documents\RAD Studio\Projects\SASP2S\Unit1.pas=</Transaction>
+    <Transaction>2018/11/16 11:31:28.823.pas,C:\Users\ISMAEL\Documents\RAD Studio\Projects\SASP2S\Unit2.pas=C:\Users\ISMAEL\Documents\RAD Studio\Projects\SASP2S\untInstalacao.pas</Transaction>
+    <Transaction>2018/11/16 11:31:28.823.dfm,C:\Users\ISMAEL\Documents\RAD Studio\Projects\SASP2S\Unit2.dfm=C:\Users\ISMAEL\Documents\RAD Studio\Projects\SASP2S\untInstalacao.dfm</Transaction>
   </Transactions>
 </BorlandProject>

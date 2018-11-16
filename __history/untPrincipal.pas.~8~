@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, ExtCtrls, StdCtrls, ButtonGroup, Buttons, Grids,
-  ComCtrls, TabNotBk, dblookup, untAtendimento,untInstalacao;
+  ComCtrls, TabNotBk, dblookup, untAtendimento;
 
 type
   TfrmPrincipal = class(TForm)
@@ -40,7 +40,6 @@ type
     procedure pnTreinamentoMouseLeave(Sender: TObject);
     procedure pnManutencaoClick(Sender: TObject);
     procedure pnAtendimentoClick(Sender: TObject);
-    procedure pnInstalacaoClick(Sender: TObject);
   private
     { Private declarations }
     tamanhoBloco, metadeBloco: integer;
@@ -76,16 +75,6 @@ begin
     frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height + 20;
   end;
 
-end;
-
-procedure TfrmPrincipal.pnInstalacaoClick(Sender: TObject);
-begin
-  if frmInstalacao = nil then
-  begin
-    Application.CreateForm(TfrmInstalacao, frmInstalacao);
-    frmPrincipal.Width:= frmInstalacao.Width;
-    frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height + 20;
-  end;
 end;
 
 procedure TfrmPrincipal.pnAtendimentoMouseEnter(Sender: TObject);

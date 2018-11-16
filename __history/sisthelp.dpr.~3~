@@ -5,8 +5,7 @@ uses
   untPrincipal in 'untPrincipal.pas' {frmPrincipal},
   untAtendimento in 'untAtendimento.pas' {frmAtendimento},
   classAtendimento in 'classAtendimento.pas',
-  classListaAtendimento in 'classListaAtendimento.pas',
-  untInstalacao in 'untInstalacao.pas' {frmInstalacao};
+  classListaAtendimento in 'classListaAtendimento.pas';
 
 {$R *.res}
 
