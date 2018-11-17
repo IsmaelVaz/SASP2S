@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc,
+  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom,
+  XMLDoc, untThreadExpXML,
   Menus;
 
 type
@@ -37,6 +38,7 @@ type
     Editar1: TMenuItem;
     sbtnCancelar: TSpeedButton;
     ckbHoraAuto: TCheckBox;
+    lblSalvandoReg: TLabel;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -80,10 +82,11 @@ type
     tempLstAtendCompleto: TclassListaAtendimento;
     tempListaAtendimento: TclassListaAtendimento;
     linhaSelecionadaGrid, idRegistroEditar: Integer;
-
+    jaSalvou: boolean;
+    caminhoArquivoSalvo: String;
   public
     { Public declarations }
-
+    estaSalvo: boolean;
   end;
 
 var
@@ -370,6 +373,9 @@ begin
   linhaSelecionadaGrid:= 0;
   idRegistroEditar:=0;
 
+  jaSalvou:= false;
+  estaSalvo:= true;
+
   with sgridHorarios do
   begin
     ColCount:= 9;
@@ -437,6 +443,7 @@ begin
     begin
       if StrToTime(edtHoraFinal.Text) > StrToTime(edtHoraInicial.Text) then
       begin
+         estaSalvo:= false;
          horaInicialRec:= StrToTime(edtHoraInicial.Text);
          horaFinalRec:= StrToTime(edtHoraFinal.Text);
          dataRefRec:= StrToDate(edtDataRef.Text);
@@ -508,44 +515,57 @@ var
   tempAtendimento: TclassAtendimento;
   caminhoArquivo: String;
   xmlDoc: IXMLDocument;
+  threadXml: TuntThreadExpXML;
 begin
+  threadXml:= TuntThreadExpXML.Create(true);
+  threadXml.FreeOnTerminate:=true;
+
+  lblSalvandoReg.Visible:= true;
   listaAtendimento:= tempListaAtendimento.RetornarLista;
   xmlDoc:= TXMLDocument.Create(nil);
 
-  if listaAtendimento.Count > 0 then
+  if (listaAtendimento.Count > 0) then
   begin
-    if fileSaveDialog.Execute then
+
+    if jaSalvou = false then
     begin
-      caminhoArquivo:= fileSaveDialog.FileName;
-      if not ContainsText(caminhoArquivo, '.xml') then
-        caminhoArquivo:= Concat(caminhoArquivo, '.xml');
-
-      xmlDoc.Active:=true;
-      xmlDoc.Version:= '1.0';
-      xmlDoc.Encoding:= 'UTF-8';
-      Objeto:= nil;
-      Objeto:= xmlDoc.AddChild('Objeto');
-
-      for tempAtendimento in listaAtendimento do
+      if fileSaveDialog.Execute then
       begin
-         ixmlAtendimento:= Objeto.AddChild('Atendimento');
-         ixmlAtendimento.Attributes['Oid']:= IntToStr(tempAtendimento.oid);
+        caminhoArquivo:= fileSaveDialog.FileName;
+        if not ContainsText(caminhoArquivo, '.xml') then
+          caminhoArquivo:= Concat(caminhoArquivo, '.xml');
+          try
+            threadXml.listaAtendimento:= listaAtendimento;
+            threadXml.caminhoArquivo:=caminhoArquivo;
+            threadXml.Resume;
+            estaSalvo:= true;
+            jaSalvou:=true;
+            caminhoArquivoSalvo:= caminhoArquivo;
 
-         ixmlAtendimento.AddChild('DataReferencia').Text := DateToStr(tempAtendimento.dataReferencia);
-         ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
-         ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
-         ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
-         ixmlAtendimento.AddChild('LancadoHD').Text := BoolToStr(tempAtendimento.lancadoHD);
-         ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
-
+          except on EConvertError do
+            threadXml.Free;
+          end;
       end;
-      xmlDoc.SaveToFile(caminhoArquivo);
-      xmlDoc.Active:=false;
-      ShowMessage('Cadastros salvos');
+    end
+    else
+    begin
+       try
+          threadXml.listaAtendimento:= listaAtendimento;
+          threadXml.caminhoArquivo:=caminhoArquivoSalvo;
+          threadXml.Resume;
+          estaSalvo:= true;
+          jaSalvou:=true;
+
+        except on EConvertError do
+          threadXml.Free;
+        end;
     end;
   end
   else
     ShowMessage('Não há cadastros para Salvar');
+
+  ShowMessage('Cadastros salvos');
+  lblSalvandoReg.Visible:= false;
 end;
 
 procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
@@ -570,6 +590,8 @@ begin
   begin
     if fileOpenDialog.Execute then
     begin
+        estaSalvo:=false;
+        jaSalvou:=false;
         xmlDoc:= TXMLDocument.Create(nil);
         xmlDoc.FileName:= fileOpenDialog.FileName;
 

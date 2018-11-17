@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc,
+  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc, untThreadExpXML,
   Menus;
 
 type
@@ -36,6 +36,8 @@ type
     Marcarcomolanado1: TMenuItem;
     Editar1: TMenuItem;
     sbtnCancelar: TSpeedButton;
+    ckbHoraAuto: TCheckBox;
+    lblSalvandoReg: TLabel;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -71,13 +73,16 @@ type
     procedure Marcarcomolanado1Click(Sender: TObject);
     procedure Editar1Click(Sender: TObject);
     procedure sbtnCancelarClick(Sender: TObject);
+    procedure edtHoraFinalEnter(Sender: TObject);
+    procedure ckbHoraAutoClick(Sender: TObject);
   private
     { Private declarations }
 
     tempLstAtendCompleto: TclassListaAtendimento;
     tempListaAtendimento: TclassListaAtendimento;
     linhaSelecionadaGrid, idRegistroEditar: Integer;
-
+    jaSalvou,estaSalvo: boolean;
+    caminhoArquivo: String;
   public
     { Public declarations }
 
@@ -107,7 +112,7 @@ begin
   listaAtendimentoReal:= tempListaAtendimento.RetornarLista;
   tempLstAtendCompleto.Free;
   tempLstAtendCompleto:= TclassListaAtendimento.Create;
-
+ // atendimentoFaltante:= TclassAtendimento.Create;
   for atendimentoReal in listaAtendimentoReal do
   begin
     atendimentoReal.oidReal:= atendimentoReal.oid;
@@ -134,7 +139,7 @@ begin
             end;
 
             tempLstAtendCompleto.Adicionar(atendimentoFaltante);
-            atendimentoFaltante.Destroy;
+            //atendimentoFaltante.Destroy;
 
         end
         else
@@ -162,13 +167,35 @@ begin
     begin
       if atendimentoSelecionado.oidReal = oidAtendimentoSelecionado then
       begin
-        atendimentoSelecionado:= tempAtendimento;
+        atendimentoSelecionado.horaInicial:= tempAtendimento.horaInicial;
+        atendimentoSelecionado.horafinal:= tempAtendimento.horafinal;
+        atendimentoSelecionado.descricao:= tempAtendimento.descricao;
+        atendimentoSelecionado.lancadoHD:= tempAtendimento.lancadoHD;
       end;
     end;
 
     sbtnCancelar.Click;
     AdicionarHoraFaltante;
     AtualizarGrid;
+end;
+
+procedure TfrmAtendimento.ckbHoraAutoClick(Sender: TObject);
+begin
+  if ckbHoraAuto.Checked = true then
+  begin
+     edtHoraInicial.TabOrder:= 1;
+     memoDescricao.TabOrder:= 2;
+     edtHoraFinal.TabOrder:= 3;
+     ckbLancadoHD.TabOrder:= 4;
+
+  end;
+  if ckbHoraAuto.Checked = false then
+  begin
+     edtHoraInicial.TabOrder:= 1;
+     edtHoraFinal.TabOrder:= 2;
+     memoDescricao.TabOrder:= 3;
+     ckbLancadoHD.TabOrder:= 4;
+  end;
 end;
 
 procedure TfrmAtendimento.AtualizarGrid;
@@ -220,6 +247,10 @@ begin
         Cells[2,1]:= '';
         Cells[3,1]:= '';
         Cells[4,1]:= '';
+        Cells[5,1]:= '';
+        Cells[6,1]:= '';
+        Cells[7,1]:= '';
+        Cells[8,1]:= '';
 
       end;
   end;
@@ -315,7 +346,7 @@ begin
         listaAtendimento:= tempListaAtendimento.RetornarLista;
         for atendimentoSelecionado in listaAtendimento do
         begin
-          if atendimentoSelecionado.oid = oidAtendimentoSelecionado then
+          if atendimentoSelecionado.oidReal = oidAtendimentoSelecionado then
           begin
             atendimentoSelecionado.lancadoHD:= true;
             AdicionarHoraFaltante;
@@ -373,7 +404,17 @@ procedure TfrmAtendimento.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Shift = [ssShift]) and (key = vk_f7) then edtDataRef.ReadOnly:=false;
+  if (Shift= [ssShift]) and (key = VK_DELETE) then
+  begin
+     If Application.MessageBox('Deseja excluir todos os registros?','CUIDADO!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+     begin
+        tempListaAtendimento.RetornarLista.Clear;
+        AdicionarHoraFaltante;
+        AtualizarGrid;
+     end;
 
+  end;
 end;
 
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -469,7 +510,11 @@ var
   tempAtendimento: TclassAtendimento;
   caminhoArquivo: String;
   xmlDoc: IXMLDocument;
+  test: TuntThreadExpXML;
 begin
+  test:= TuntThreadExpXML.Create(true);
+  test.FreeOnTerminate:=true;
+  lblSalvandoReg.Visible:= true;
   listaAtendimento:= tempListaAtendimento.RetornarLista;
   xmlDoc:= TXMLDocument.Create(nil);
 
@@ -480,8 +525,15 @@ begin
       caminhoArquivo:= fileSaveDialog.FileName;
       if not ContainsText(caminhoArquivo, '.xml') then
         caminhoArquivo:= Concat(caminhoArquivo, '.xml');
+        try
+          test.listaAtendimento:= listaAtendimento;
+          test.caminhoArquivo:=caminhoArquivo;
+          test.Resume;
+        except on EConvertError do
+          test.Free;
 
-      xmlDoc.Active:=true;
+        end;
+      {xmlDoc.Active:=true;
       xmlDoc.Version:= '1.0';
       xmlDoc.Encoding:= 'UTF-8';
       Objeto:= nil;
@@ -501,12 +553,16 @@ begin
 
       end;
       xmlDoc.SaveToFile(caminhoArquivo);
-      xmlDoc.Active:=false;
+      xmlDoc.Active:=false;}
+
       ShowMessage('Cadastros salvos');
+
     end;
   end
   else
     ShowMessage('Não há cadastros para Salvar');
+
+  lblSalvandoReg.Visible:= false;
 end;
 
 procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
@@ -561,14 +617,14 @@ var
   oidAtendimentoSelecionado: Integer;
   atendimentoSelecionado: TclassAtendimento;
   listaAtendimento: TObjectList<TclassAtendimento>;
-  tempQuemLancou: String;
+  tempFalta: String;
 begin
   if linhaSelecionadaGrid <> 0 then
   begin
     oidAtendimentoSelecionado:= StrToInt(sgridHorarios.Cells[8, linhaSelecionadaGrid]);
-    tempQuemLancou:= sgridHorarios.Cells[0, linhaSelecionadaGrid];
+    tempFalta:= sgridHorarios.Cells[7, linhaSelecionadaGrid];
 
-    if oidAtendimentoSelecionado <> 0 then
+    if (oidAtendimentoSelecionado <> 0) and (AnsiCompareText(tempFalta, 'SIM') <> 0) then
     begin
       If Application.MessageBox('Deseja Excluir o Regitro selecionado ?','Atenção!',MB_YESNO +
                              MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
@@ -578,7 +634,7 @@ begin
         begin
             for atendimentoSelecionado in listaAtendimento do
             begin
-              if atendimentoSelecionado.oid = oidAtendimentoSelecionado then
+              if atendimentoSelecionado.oidReal = oidAtendimentoSelecionado then
               begin
                 tempListaAtendimento.Remover(atendimentoSelecionado);
                 AdicionarHoraFaltante;
@@ -601,6 +657,16 @@ begin
 end;
 
 // Marcaras de hora
+procedure TfrmAtendimento.edtHoraFinalEnter(Sender: TObject);
+begin
+  if ckbHoraAuto.Checked then
+  begin
+    edtHoraFinal.Text:= Copy(timetostr(time()), 0, 5);
+    edtHoraFinal.SelStart := Length(edtHoraFinal.Text );
+    edtHoraFinal.SelectAll;
+  end;
+end;
+
 procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);
 begin
   if not (Key in ['0'..'9', #8]) then

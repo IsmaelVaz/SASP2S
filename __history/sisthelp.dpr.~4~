@@ -6,8 +6,7 @@ uses
   untAtendimento in 'untAtendimento.pas' {frmAtendimento},
   classAtendimento in 'classAtendimento.pas',
   classListaAtendimento in 'classListaAtendimento.pas',
-  untInstalacao in 'untInstalacao.pas' {frmInstalacao},
-  untThreadExpXML in 'untThreadExpXML.pas';
+  untInstalacao in 'untInstalacao.pas' {frmInstalacao};
 
 {$R *.res}
 

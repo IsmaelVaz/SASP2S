@@ -26,7 +26,6 @@ object frmInstalacao: TfrmInstalacao
     Color = clSkyBlue
     ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = 8
     DesignSize = (
       153
       404)
@@ -229,6 +228,8 @@ object frmInstalacao: TfrmInstalacao
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
+    ExplicitLeft = 127
+    ExplicitWidth = 602
     object pnTitulo: TPanel
       Left = 1
       Top = 1
@@ -238,6 +239,8 @@ object frmInstalacao: TfrmInstalacao
       Color = clMenuBar
       ParentBackground = False
       TabOrder = 0
+      ExplicitLeft = 6
+      ExplicitTop = 0
     end
     object pnConteudo: TPanel
       Left = 1
@@ -246,6 +249,10 @@ object frmInstalacao: TfrmInstalacao
       Height = 361
       Align = alClient
       TabOrder = 1
+      ExplicitLeft = 224
+      ExplicitTop = 144
+      ExplicitWidth = 185
+      ExplicitHeight = 41
     end
   end
 end

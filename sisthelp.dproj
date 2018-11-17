@@ -54,6 +54,7 @@
 			<DCCReference Include="untInstalacao.pas">
 				<Form>frmInstalacao</Form>
 			</DCCReference>
+			<DCCReference Include="untThreadExpXML.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc,
+  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc, untThreadExpXML,
   Menus;
 
 type
@@ -36,6 +36,8 @@ type
     Marcarcomolanado1: TMenuItem;
     Editar1: TMenuItem;
     sbtnCancelar: TSpeedButton;
+    ckbHoraAuto: TCheckBox;
+    lblSalvandoReg: TLabel;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -72,6 +74,7 @@ type
     procedure Editar1Click(Sender: TObject);
     procedure sbtnCancelarClick(Sender: TObject);
     procedure edtHoraFinalEnter(Sender: TObject);
+    procedure ckbHoraAutoClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -173,6 +176,25 @@ begin
     sbtnCancelar.Click;
     AdicionarHoraFaltante;
     AtualizarGrid;
+end;
+
+procedure TfrmAtendimento.ckbHoraAutoClick(Sender: TObject);
+begin
+  if ckbHoraAuto.Checked = true then
+  begin
+     edtHoraInicial.TabOrder:= 1;
+     memoDescricao.TabOrder:= 2;
+     edtHoraFinal.TabOrder:= 3;
+     ckbLancadoHD.TabOrder:= 4;
+
+  end;
+  if ckbHoraAuto.Checked = false then
+  begin
+     edtHoraInicial.TabOrder:= 1;
+     edtHoraFinal.TabOrder:= 2;
+     memoDescricao.TabOrder:= 3;
+     ckbLancadoHD.TabOrder:= 4;
+  end;
 end;
 
 procedure TfrmAtendimento.AtualizarGrid;
@@ -381,7 +403,17 @@ procedure TfrmAtendimento.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Shift = [ssShift]) and (key = vk_f7) then edtDataRef.ReadOnly:=false;
+  if (Shift= [ssShift]) and (key = VK_DELETE) then
+  begin
+     If Application.MessageBox('Deseja excluir todos os registros?','CUIDADO!',MB_YESNO +
+                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+     begin
+        tempListaAtendimento.RetornarLista.Clear;
+        AdicionarHoraFaltante;
+        AtualizarGrid;
+     end;
 
+  end;
 end;
 
 procedure TfrmAtendimento.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -478,6 +510,8 @@ var
   caminhoArquivo: String;
   xmlDoc: IXMLDocument;
 begin
+
+  lblSalvandoReg.Visible:= true;
   listaAtendimento:= tempListaAtendimento.RetornarLista;
   xmlDoc:= TXMLDocument.Create(nil);
 
@@ -511,10 +545,13 @@ begin
       xmlDoc.SaveToFile(caminhoArquivo);
       xmlDoc.Active:=false;
       ShowMessage('Cadastros salvos');
+
     end;
   end
   else
     ShowMessage('Não há cadastros para Salvar');
+
+  lblSalvandoReg.Visible:= false;
 end;
 
 procedure TfrmAtendimento.sbtnAbrirHorarioClick(Sender: TObject);
@@ -611,10 +648,12 @@ end;
 // Marcaras de hora
 procedure TfrmAtendimento.edtHoraFinalEnter(Sender: TObject);
 begin
-  edtHoraFinal.Text:= Copy(timetostr(time()), 0, 5);
-  edtHoraFinal.SelStart := Length(edtHoraFinal.Text );
-  edtHoraFinal.SelectAll;
-
+  if ckbHoraAuto.Checked then
+  begin
+    edtHoraFinal.Text:= Copy(timetostr(time()), 0, 5);
+    edtHoraFinal.SelStart := Length(edtHoraFinal.Text );
+    edtHoraFinal.SelectAll;
+  end;
 end;
 
 procedure TfrmAtendimento.edtHoraFinalKeyPress(Sender: TObject; var Key: Char);

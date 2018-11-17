@@ -41,7 +41,6 @@ type
     procedure pnManutencaoClick(Sender: TObject);
     procedure pnAtendimentoClick(Sender: TObject);
     procedure pnInstalacaoClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     tamanhoBloco, metadeBloco: integer;
@@ -55,18 +54,6 @@ var
 implementation
 
 {$R *.dfm}
-
-procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  if (frmAtendimento <> nil) and (frmAtendimento.estaSalvo = false) then
-  begin
-    If Application.MessageBox('Deseja salvar os registros do módulo atendimento?','CUIDADO!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
-     begin
-        frmAtendimento.sbtnSalvarHorario.Click;
-     end;
-  end;
-end;
 
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 
@@ -87,12 +74,6 @@ begin
     Application.CreateForm(TfrmAtendimento, frmAtendimento);
     frmPrincipal.Width:= frmAtendimento.Width;
     frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height + 20;
-  end
-  else
-  begin
-    frmAtendimento.Show;
-    frmPrincipal.Width:= frmAtendimento.Width;
-    frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height;
   end;
 
 end;
@@ -104,12 +85,6 @@ begin
     Application.CreateForm(TfrmInstalacao, frmInstalacao);
     frmPrincipal.Width:= frmInstalacao.Width;
     frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height + 20;
-  end
-  else
-  begin
-    frmInstalacao.Show;
-    frmPrincipal.Width:= frmInstalacao.Width;
-    frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height;
   end;
 end;
 

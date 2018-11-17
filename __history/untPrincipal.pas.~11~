@@ -87,12 +87,6 @@ begin
     Application.CreateForm(TfrmAtendimento, frmAtendimento);
     frmPrincipal.Width:= frmAtendimento.Width;
     frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height + 20;
-  end
-  else
-  begin
-    frmAtendimento.Show;
-    frmPrincipal.Width:= frmAtendimento.Width;
-    frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height;
   end;
 
 end;
@@ -104,12 +98,6 @@ begin
     Application.CreateForm(TfrmInstalacao, frmInstalacao);
     frmPrincipal.Width:= frmInstalacao.Width;
     frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height + 20;
-  end
-  else
-  begin
-    frmInstalacao.Show;
-    frmPrincipal.Width:= frmInstalacao.Width;
-    frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height;
   end;
 end;
 
