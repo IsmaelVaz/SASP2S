@@ -41,7 +41,7 @@ type
     procedure pnManutencaoClick(Sender: TObject);
     procedure pnAtendimentoClick(Sender: TObject);
     procedure pnInstalacaoClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     { Private declarations }
     tamanhoBloco, metadeBloco: integer;
@@ -56,16 +56,27 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  result: integer;
 begin
   if (frmAtendimento <> nil) and (frmAtendimento.estaSalvo = false) then
   begin
-    If Application.MessageBox('Deseja salvar os registros do módulo atendimento?','CUIDADO!',MB_YESNO +
-                           MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
+    result:= Application.MessageBox('Deseja salvar os registros do módulo atendimento?','CUIDADO!',MB_YESNOCANCEL +
+                           MB_ICONQUESTION + MB_DEFBUTTON2);
+    if result = IDYES Then
      begin
         frmAtendimento.sbtnSalvarHorario.Click;
+     end
+     else
+     begin
+       if result = IDCANCEL then
+       begin
+          CanClose:= false;
+       end;
      end;
   end;
+
 end;
 
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
