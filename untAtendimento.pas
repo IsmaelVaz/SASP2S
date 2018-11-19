@@ -414,6 +414,7 @@ begin
                            MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
      begin
         tempListaAtendimento.RetornarLista.Clear;
+        jaSalvou:= false;
         AdicionarHoraFaltante;
         AtualizarGrid;
      end;
@@ -541,7 +542,7 @@ begin
             estaSalvo:= true;
             jaSalvou:=true;
             caminhoArquivoSalvo:= caminhoArquivo;
-
+            ShowMessage('Cadastros salvos');
           except on EConvertError do
             threadXml.Free;
           end;
@@ -555,7 +556,7 @@ begin
           threadXml.Resume;
           estaSalvo:= true;
           jaSalvou:=true;
-
+          ShowMessage('Cadastros salvos');
         except on EConvertError do
           threadXml.Free;
         end;
@@ -564,7 +565,7 @@ begin
   else
     ShowMessage('Não há cadastros para Salvar');
 
-  ShowMessage('Cadastros salvos');
+
   lblSalvandoReg.Visible:= false;
 end;
 
