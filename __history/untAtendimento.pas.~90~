@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
-  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom, XMLDoc, untThreadExpXML,
+  classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom,
+  XMLDoc, untThreadExpXML,
   Menus;
 
 type
@@ -75,6 +76,7 @@ type
     procedure sbtnCancelarClick(Sender: TObject);
     procedure edtHoraFinalEnter(Sender: TObject);
     procedure ckbHoraAutoClick(Sender: TObject);
+    procedure ExportarXML(listaAtendimento: TObjectList<TclassAtendimento>; caminhoArquivo: String):boolean;
   private
     { Private declarations }
 
@@ -363,6 +365,41 @@ begin
     ShowMessage('Selecione um Registro!');
 end;
 
+procedure TfrmAtendimento.ExportarXML(listaAtendimento: TObjectList<TclassAtendimento>; caminhoArquivo: String):boolean;
+  var
+  ixmlAtendimento,Objeto: IXMLNode;
+  tempAtendimento: TclassAtendimento;
+  xmlDoc: IXMLDocument;
+  qtdRegistro: Integer;
+begin
+qtdRegistro:= listaAtendimento.Count;
+  xmlDoc:= TXMLDocument.Create(nil);
+
+  xmlDoc.Active:=true;
+  xmlDoc.Version:= '1.0';
+  xmlDoc.Encoding:= 'UTF-8';
+  Objeto:= nil;
+  Objeto:= xmlDoc.AddChild('Objeto');
+
+  for tempAtendimento in listaAtendimento do
+  begin
+     ixmlAtendimento:= Objeto.AddChild('Atendimento');
+     ixmlAtendimento.Attributes['Oid']:= IntToStr(tempAtendimento.oid);
+
+     ixmlAtendimento.AddChild('DataReferencia').Text := DateToStr(tempAtendimento.dataReferencia);
+     ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
+     ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
+     ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
+     ixmlAtendimento.AddChild('LancadoHD').Text := BoolToStr(tempAtendimento.lancadoHD);
+     ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
+
+  end;
+  xmlDoc.SaveToFile(caminhoArquivo);
+  xmlDoc.Active:=false;
+  ShowMessage('Cadastros salvos'+#13+caminhoArquivo+#13+'Qtd: '+inttostr(qtdRegistro));
+
+end;
+
 procedure TfrmAtendimento.FormCreate(Sender: TObject);
 begin
   tempListaAtendimento:= TclassListaAtendimento.Create;
@@ -373,7 +410,7 @@ begin
   idRegistroEditar:=0;
 
   jaSalvou:= false;
-  estaSalvo:= false;
+  estaSalvo:= true;
 
   with sgridHorarios do
   begin
@@ -413,6 +450,7 @@ begin
                            MB_ICONQUESTION + MB_DEFBUTTON2) = IDYES Then
      begin
         tempListaAtendimento.RetornarLista.Clear;
+        jaSalvou:= false;
         AdicionarHoraFaltante;
         AtualizarGrid;
      end;
@@ -442,6 +480,7 @@ begin
     begin
       if StrToTime(edtHoraFinal.Text) > StrToTime(edtHoraInicial.Text) then
       begin
+         estaSalvo:= false;
          horaInicialRec:= StrToTime(edtHoraInicial.Text);
          horaFinalRec:= StrToTime(edtHoraFinal.Text);
          dataRefRec:= StrToDate(edtDataRef.Text);
@@ -512,61 +551,56 @@ var
   listaAtendimento: TObjectList<TclassAtendimento>;
   tempAtendimento: TclassAtendimento;
   caminhoArquivo: String;
-  xmlDoc: IXMLDocument;
-  test: TuntThreadExpXML;
+  threadXml: TuntThreadExpXML;
+  qtdRegistro: Integer;
 begin
-  test:= TuntThreadExpXML.Create(true);
-  test.FreeOnTerminate:=true;
+  threadXml:= TuntThreadExpXML.Create(true);
+  threadXml.FreeOnTerminate:=true;
+
   lblSalvandoReg.Visible:= true;
   listaAtendimento:= tempListaAtendimento.RetornarLista;
-  xmlDoc:= TXMLDocument.Create(nil);
+  qtdRegistro:= listaAtendimento.Count;
 
-  if listaAtendimento.Count > 0 then
+  if (listaAtendimento.Count > 0) then
   begin
-    if fileSaveDialog.Execute then
+
+    if jaSalvou = false then
     begin
-      caminhoArquivo:= fileSaveDialog.FileName;
-      if not ContainsText(caminhoArquivo, '.xml') then
-        caminhoArquivo:= Concat(caminhoArquivo, '.xml');
-        try
-          test.listaAtendimento:= listaAtendimento;
-          test.caminhoArquivo:=caminhoArquivo;
-          test.Resume;
+      if fileSaveDialog.Execute then
+      begin
+        caminhoArquivo:= fileSaveDialog.FileName;
+        if not ContainsText(caminhoArquivo, '.xml') then
+          caminhoArquivo:= Concat(caminhoArquivo, '.xml');
+          try
+            threadXml.listaAtendimento:= listaAtendimento;
+            threadXml.caminhoArquivo:=caminhoArquivo;
+            threadXml.Resume;
+            estaSalvo:= true;
+            jaSalvou:=true;
+            caminhoArquivoSalvo:= caminhoArquivo;
+            //ShowMessage('Cadastros salvos'+#13+caminhoArquivo+#13+caminhoArquivoSalvo+#13+'Qtd: '+inttostr(qtdRegistro));
+          except on EConvertError do
+            threadXml.Free;
+          end;
+      end;
+    end
+    else
+    begin
+       try
+          threadXml.listaAtendimento:= listaAtendimento;
+          threadXml.caminhoArquivo:=caminhoArquivoSalvo;
+          threadXml.Resume;
           estaSalvo:= true;
           jaSalvou:=true;
-          caminhoArquivoSalvo:= caminhoArquivo;
+          //ShowMessage('Cadastros salvos'+#13+caminhoArquivoSalvo);
         except on EConvertError do
-          test.Free;
-
+          threadXml.Free;
         end;
-      {xmlDoc.Active:=true;
-      xmlDoc.Version:= '1.0';
-      xmlDoc.Encoding:= 'UTF-8';
-      Objeto:= nil;
-      Objeto:= xmlDoc.AddChild('Objeto');
-
-      for tempAtendimento in listaAtendimento do
-      begin
-         ixmlAtendimento:= Objeto.AddChild('Atendimento');
-         ixmlAtendimento.Attributes['Oid']:= IntToStr(tempAtendimento.oid);
-
-         ixmlAtendimento.AddChild('DataReferencia').Text := DateToStr(tempAtendimento.dataReferencia);
-         ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
-         ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
-         ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
-         ixmlAtendimento.AddChild('LancadoHD').Text := BoolToStr(tempAtendimento.lancadoHD);
-         ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
-
-      end;
-      xmlDoc.SaveToFile(caminhoArquivo);
-      xmlDoc.Active:=false;}
-
-      ShowMessage('Cadastros salvos');
-
     end;
   end
   else
     ShowMessage('Não há cadastros para Salvar');
+
 
   lblSalvandoReg.Visible:= false;
 end;
@@ -593,6 +627,8 @@ begin
   begin
     if fileOpenDialog.Execute then
     begin
+        estaSalvo:=false;
+        jaSalvou:=false;
         xmlDoc:= TXMLDocument.Create(nil);
         xmlDoc.FileName:= fileOpenDialog.FileName;
 

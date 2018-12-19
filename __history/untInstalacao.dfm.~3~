@@ -2,7 +2,7 @@ object frmInstalacao: TfrmInstalacao
   Left = 0
   Top = 0
   Caption = 'Instala'#231#227'o'
-  ClientHeight = 415
+  ClientHeight = 404
   ClientWidth = 725
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,18 +20,19 @@ object frmInstalacao: TfrmInstalacao
   object pnMenu: TPanel
     Left = 0
     Top = 0
-    Width = 161
-    Height = 415
+    Width = 153
+    Height = 404
     Align = alLeft
     Color = clSkyBlue
     ParentBackground = False
     TabOrder = 0
+    ExplicitLeft = 8
     DesignSize = (
-      161
-      415)
+      153
+      404)
     object imgLogo: TImage
       Left = 0
-      Top = 371
+      Top = 360
       Width = 153
       Height = 33
       Anchors = [akLeft, akBottom]
@@ -217,89 +218,34 @@ object frmInstalacao: TfrmInstalacao
         1E1E99617900F14EABCBEBDF2599CA9D291930A1FDACCE380403D00FB03600D2
         88FD22F9D0327B5BBD23D607DA9B6E7D19F54AFE0D36EBC041B9546B21000000
         0049454E44AE426082}
-      ExplicitTop = 360
-    end
-    object CategoryPanelGroup1: TCategoryPanelGroup
-      Left = 1
-      Top = 1
-      Width = 152
-      Height = 344
-      VertScrollBar.Tracking = True
-      Align = alNone
-      BevelInner = bvNone
-      BevelOuter = bvNone
-      Color = clSkyBlue
-      HeaderFont.Charset = DEFAULT_CHARSET
-      HeaderFont.Color = clWindowText
-      HeaderFont.Height = -11
-      HeaderFont.Name = 'Tahoma'
-      HeaderFont.Style = []
-      TabOrder = 0
-      object CategoryPanel2: TCategoryPanel
-        AlignWithMargins = True
-        Top = 150
-        Height = 125
-        Margins.Top = 15
-        Caption = 'Primestart Client'
-        TabOrder = 0
-        ExplicitLeft = 4
-        ExplicitTop = 165
-        object CategoryPanelGroup2: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Height = 99
-          VertScrollBar.Tracking = True
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -11
-          HeaderFont.Name = 'Tahoma'
-          HeaderFont.Style = []
-          TabOrder = 0
-          ExplicitLeft = 56
-          ExplicitHeight = 350
-        end
-      end
-      object CategoryPanel1: TCategoryPanel
-        AlignWithMargins = True
-        Top = 3
-        Height = 129
-        Caption = 'Primestart Server'
-        TabOrder = 1
-      end
     end
   end
   object pnDados: TPanel
-    Left = 161
+    Left = 153
     Top = 0
-    Width = 564
-    Height = 415
+    Width = 572
+    Height = 404
     Align = alClient
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
-    ExplicitLeft = 153
-    ExplicitWidth = 572
-    ExplicitHeight = 404
     object pnTitulo: TPanel
       Left = 1
       Top = 1
-      Width = 562
+      Width = 570
       Height = 41
       Align = alTop
       Color = clMenuBar
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 570
     end
     object pnConteudo: TPanel
       Left = 1
       Top = 42
-      Width = 562
-      Height = 372
+      Width = 570
+      Height = 361
       Align = alClient
       TabOrder = 1
-      ExplicitWidth = 570
-      ExplicitHeight = 361
     end
   end
 end

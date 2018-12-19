@@ -58,9 +58,9 @@ var
   ixmlAtendimento,Objeto: IXMLNode;
   tempAtendimento: TclassAtendimento;
   xmlDoc: IXMLDocument;
-  qtdRegistro: Integer;
+
 begin
-   qtdRegistro:= listaAtendimento.Count;
+
   xmlDoc:= TXMLDocument.Create(nil);
 
   xmlDoc.Active:=true;
@@ -84,7 +84,6 @@ begin
   end;
   xmlDoc.SaveToFile(caminhoArquivo);
   xmlDoc.Active:=false;
-  ShowMessage('Cadastros salvos'+#13+caminhoArquivo+#13+'Qtd: '+inttostr(qtdRegistro));
 
 end;
 procedure TuntThreadExpXML.Execute;
