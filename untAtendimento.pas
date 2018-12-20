@@ -455,7 +455,6 @@ begin
         AdicionarHoraFaltante;
         AtualizarGrid;
      end;
-
   end;
 end;
 
@@ -486,8 +485,6 @@ begin
          horaFinalRec:= StrToTime(edtHoraFinal.Text);
          dataRefRec:= StrToDate(edtDataRef.Text);
          descricaoRec:= memoDescricao.Text;
-
-
            tempAtendimento:= TclassAtendimento.Create;
            with tempAtendimento do
            begin
@@ -510,12 +507,9 @@ begin
                begin
                  tempAtendimento.oid:= idRegistroEditar;
                  AtualizarHora(tempAtendimento);
-
                end;
              end;
-
          end
-
       end
       else
       begin
@@ -562,27 +556,18 @@ begin
   listaAtendimento:= tempListaAtendimento.RetornarLista;
   qtdRegistro:= listaAtendimento.Count;
 
+  fileSaveDialog.FileName:= formatdatetime('yyyy-mm-dd', date()) + '.xml';
   if (listaAtendimento.Count > 0) then
   begin
 
     if jaSalvou = false then
     begin
+
       if fileSaveDialog.Execute then
       begin
         caminhoArquivo:= fileSaveDialog.FileName;
         if not ContainsText(caminhoArquivo, '.xml') then
           caminhoArquivo:= Concat(caminhoArquivo, '.xml');
-         { try
-            threadXml.listaAtendimento:= listaAtendimento;
-            threadXml.caminhoArquivo:=caminhoArquivo;
-            threadXml.Resume;
-
-
-
-            //ShowMessage('Cadastros salvos'+#13+caminhoArquivo+#13+caminhoArquivoSalvo+#13+'Qtd: '+inttostr(qtdRegistro));
-          except on EConvertError do
-            threadXml.Free;
-          end; }
           if ExportarXML(listaAtendimento, caminhoArquivo) then
           begin
               estaSalvo:= true;
@@ -597,25 +582,15 @@ begin
     end
     else
     begin
-       {try
-          threadXml.listaAtendimento:= listaAtendimento;
-          threadXml.caminhoArquivo:=caminhoArquivoSalvo;
-          threadXml.Resume;
-          estaSalvo:= true;
-          jaSalvou:=true;
-          //ShowMessage('Cadastros salvos'+#13+caminhoArquivoSalvo);
-        except on EConvertError do
-          threadXml.Free;
-        end;}
-         if ExportarXML(listaAtendimento, caminhoArquivoSalvo) then
-          begin
-              estaSalvo:= true;
-              jaSalvou:=true;
-          end
-          else
-          begin
-             ShowMessage('[2] Não foi possível salvar o XML');
-          end;
+       if ExportarXML(listaAtendimento, caminhoArquivoSalvo) then
+        begin
+            estaSalvo:= true;
+            jaSalvou:=true;
+        end
+        else
+        begin
+           ShowMessage('[2] Não foi possível salvar o XML');
+        end;
     end;
   end
   else
