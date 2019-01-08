@@ -34,11 +34,12 @@ type
     fileOpenDialog: TFileOpenDialog;
     ckbLancadoHD: TCheckBox;
     PopupMenu1: TPopupMenu;
-    Marcarcomolanado1: TMenuItem;
-    Editar1: TMenuItem;
+    pmenuMarcarLanc: TMenuItem;
+    pmenuEditar: TMenuItem;
     sbtnCancelar: TSpeedButton;
     ckbHoraAuto: TCheckBox;
     lblSalvandoReg: TLabel;
+    pmenuCopiar: TMenuItem;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -61,21 +62,19 @@ type
     procedure AtualizarGrid;
     function ValidarHora(horaEnviada: String):boolean;
     function VerificarHoraExistente(tempAtendimento: TclassAtendimento):Boolean;
-   // procedure FormKeyPress(Sender: TObject; var Key: Char);
-   { procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y, HitTest: Integer;
-      var MouseActivate: TMouseActivate); }
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure sgridHorariosMouseActivate(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y, HitTest: Integer;
       var MouseActivate: TMouseActivate);
     procedure sgridHorariosMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure Marcarcomolanado1Click(Sender: TObject);
-    procedure Editar1Click(Sender: TObject);
+    procedure pmenuMarcarLancClick(Sender: TObject);
+    procedure pmenuEditarClick(Sender: TObject);
     procedure sbtnCancelarClick(Sender: TObject);
     procedure edtHoraFinalEnter(Sender: TObject);
     procedure ckbHoraAutoClick(Sender: TObject);
+    function ExportarXML(listaAtendimento: TObjectList<TclassAtendimento>; caminhoArquivo: String):boolean;
+    procedure pmenuCopiarClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -259,7 +258,41 @@ begin
 
 end;
 
-procedure TfrmAtendimento.Editar1Click(Sender: TObject);
+procedure TfrmAtendimento.pmenuCopiarClick(Sender: TObject);
+var
+  oidAtendimentoSelecionado: Integer;
+  atendimentoSelecionado: TclassAtendimento;
+  listaAtendimento: TObjectList<TclassAtendimento>;
+  tempQuemLancou: String;
+begin
+  if linhaSelecionadaGrid <> 0 then
+  begin
+    oidAtendimentoSelecionado:= StrToInt(sgridHorarios.Cells[8, linhaSelecionadaGrid]);
+    idRegistroEditar:= oidAtendimentoSelecionado;
+
+    if oidAtendimentoSelecionado <> 0 then
+    begin
+
+        listaAtendimento:= tempListaAtendimento.RetornarLista;
+        for atendimentoSelecionado in listaAtendimento do
+        begin
+          if atendimentoSelecionado.oidReal = oidAtendimentoSelecionado then
+          begin
+            atendimentoSelecionado.descricao
+          end;
+        end;
+    end
+    else
+    begin
+       ShowMessage('Selecione um Registro!');
+    end;
+  end
+  else
+    ShowMessage('Selecione um Registro!');
+end;
+end;
+
+procedure TfrmAtendimento.pmenuEditarClick(Sender: TObject);
 var
   oidAtendimentoSelecionado: Integer;
   atendimentoSelecionado: TclassAtendimento;
@@ -330,7 +363,7 @@ begin
   ckbLancadoHD.Checked:= false;
 end;
 
-procedure TfrmAtendimento.Marcarcomolanado1Click(Sender: TObject);
+procedure TfrmAtendimento.pmenuMarcarLancClick(Sender: TObject);
 var
   oidAtendimentoSelecionado: Integer;
   atendimentoSelecionado: TclassAtendimento;
@@ -362,6 +395,46 @@ begin
   end
   else
     ShowMessage('Selecione um Registro!');
+end;
+
+function TfrmAtendimento.ExportarXML(listaAtendimento: TObjectList<TclassAtendimento>; caminhoArquivo: String):boolean;
+  var
+  ixmlAtendimento,Objeto: IXMLNode;
+  tempAtendimento: TclassAtendimento;
+  xmlDoc: IXMLDocument;
+  qtdRegistro: Integer;
+begin
+  qtdRegistro:= listaAtendimento.Count;
+  xmlDoc:= TXMLDocument.Create(nil);
+  try
+
+
+  xmlDoc.Active:=true;
+  xmlDoc.Version:= '1.0';
+  xmlDoc.Encoding:= 'UTF-8';
+  Objeto:= nil;
+  Objeto:= xmlDoc.AddChild('Objeto');
+
+  for tempAtendimento in listaAtendimento do
+  begin
+     ixmlAtendimento:= Objeto.AddChild('Atendimento');
+     ixmlAtendimento.Attributes['Oid']:= IntToStr(tempAtendimento.oid);
+
+     ixmlAtendimento.AddChild('DataReferencia').Text := DateToStr(tempAtendimento.dataReferencia);
+     ixmlAtendimento.AddChild('HoraInicial').Text := TimeToStr(tempAtendimento.horaInicial);
+     ixmlAtendimento.AddChild('HoraFinal').Text := TimeToStr(tempAtendimento.horaFinal);
+     ixmlAtendimento.AddChild('Descricao').Text := tempAtendimento.descricao;
+     ixmlAtendimento.AddChild('LancadoHD').Text := BoolToStr(tempAtendimento.lancadoHD);
+     ixmlAtendimento.AddChild('QuemInseriu').Text := BoolToStr(tempAtendimento.quemInseriu);
+
+  end;
+  xmlDoc.SaveToFile(caminhoArquivo);
+  xmlDoc.Active:=false;
+  ShowMessage('Cadastros salvos'+#13+caminhoArquivo+#13+'Qtd: '+inttostr(qtdRegistro));
+  result:= true;
+  except
+     result:= false;
+  end;
 end;
 
 procedure TfrmAtendimento.FormCreate(Sender: TObject);
@@ -418,7 +491,6 @@ begin
         AdicionarHoraFaltante;
         AtualizarGrid;
      end;
-
   end;
 end;
 
@@ -449,8 +521,6 @@ begin
          horaFinalRec:= StrToTime(edtHoraFinal.Text);
          dataRefRec:= StrToDate(edtDataRef.Text);
          descricaoRec:= memoDescricao.Text;
-
-
            tempAtendimento:= TclassAtendimento.Create;
            with tempAtendimento do
            begin
@@ -473,12 +543,9 @@ begin
                begin
                  tempAtendimento.oid:= idRegistroEditar;
                  AtualizarHora(tempAtendimento);
-
                end;
              end;
-
          end
-
       end
       else
       begin
@@ -515,50 +582,50 @@ var
   listaAtendimento: TObjectList<TclassAtendimento>;
   tempAtendimento: TclassAtendimento;
   caminhoArquivo: String;
-  xmlDoc: IXMLDocument;
   threadXml: TuntThreadExpXML;
+  qtdRegistro: Integer;
 begin
   threadXml:= TuntThreadExpXML.Create(true);
   threadXml.FreeOnTerminate:=true;
 
   lblSalvandoReg.Visible:= true;
   listaAtendimento:= tempListaAtendimento.RetornarLista;
-  xmlDoc:= TXMLDocument.Create(nil);
+  qtdRegistro:= listaAtendimento.Count;
 
+  fileSaveDialog.FileName:= formatdatetime('yyyy-mm-dd', date()) + '.xml';
   if (listaAtendimento.Count > 0) then
   begin
 
     if jaSalvou = false then
     begin
+
       if fileSaveDialog.Execute then
       begin
         caminhoArquivo:= fileSaveDialog.FileName;
         if not ContainsText(caminhoArquivo, '.xml') then
           caminhoArquivo:= Concat(caminhoArquivo, '.xml');
-          try
-            threadXml.listaAtendimento:= listaAtendimento;
-            threadXml.caminhoArquivo:=caminhoArquivo;
-            threadXml.Resume;
-            estaSalvo:= true;
-            jaSalvou:=true;
-            caminhoArquivoSalvo:= caminhoArquivo;
-            ShowMessage('Cadastros salvos');
-          except on EConvertError do
-            threadXml.Free;
+          if ExportarXML(listaAtendimento, caminhoArquivo) then
+          begin
+              estaSalvo:= true;
+              jaSalvou:=true;
+              caminhoArquivoSalvo:= caminhoArquivo;
+          end
+          else
+          begin
+             ShowMessage('[1] Não foi possível salvar o XML');
           end;
       end;
     end
     else
     begin
-       try
-          threadXml.listaAtendimento:= listaAtendimento;
-          threadXml.caminhoArquivo:=caminhoArquivoSalvo;
-          threadXml.Resume;
-          estaSalvo:= true;
-          jaSalvou:=true;
-          ShowMessage('Cadastros salvos');
-        except on EConvertError do
-          threadXml.Free;
+       if ExportarXML(listaAtendimento, caminhoArquivoSalvo) then
+        begin
+            estaSalvo:= true;
+            jaSalvou:=true;
+        end
+        else
+        begin
+           ShowMessage('[2] Não foi possível salvar o XML');
         end;
     end;
   end

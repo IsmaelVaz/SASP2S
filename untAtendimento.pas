@@ -7,7 +7,7 @@ uses
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
   classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom,
   XMLDoc, untThreadExpXML,
-  Menus;
+  Menus, ClipBrd;
 
 type
   TfrmAtendimento = class(TForm)
@@ -34,11 +34,12 @@ type
     fileOpenDialog: TFileOpenDialog;
     ckbLancadoHD: TCheckBox;
     PopupMenu1: TPopupMenu;
-    Marcarcomolanado1: TMenuItem;
-    Editar1: TMenuItem;
+    pmenuMarcarLanc: TMenuItem;
+    pmenuEditar: TMenuItem;
     sbtnCancelar: TSpeedButton;
     ckbHoraAuto: TCheckBox;
     lblSalvandoReg: TLabel;
+    pmenuCopiar: TMenuItem;
     procedure sbtnLimparClick(Sender: TObject);
     procedure sbtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -67,12 +68,13 @@ type
       var MouseActivate: TMouseActivate);
     procedure sgridHorariosMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure Marcarcomolanado1Click(Sender: TObject);
-    procedure Editar1Click(Sender: TObject);
+    procedure pmenuMarcarLancClick(Sender: TObject);
+    procedure pmenuEditarClick(Sender: TObject);
     procedure sbtnCancelarClick(Sender: TObject);
     procedure edtHoraFinalEnter(Sender: TObject);
     procedure ckbHoraAutoClick(Sender: TObject);
     function ExportarXML(listaAtendimento: TObjectList<TclassAtendimento>; caminhoArquivo: String):boolean;
+    procedure pmenuCopiarClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -256,7 +258,47 @@ begin
 
 end;
 
-procedure TfrmAtendimento.Editar1Click(Sender: TObject);
+procedure TfrmAtendimento.pmenuCopiarClick(Sender: TObject);
+var
+  oidAtendimentoSelecionado: Integer;
+  atendimentoSelecionado: TclassAtendimento;
+  listaAtendimento: TObjectList<TclassAtendimento>;
+  tempQuemLancou: String;
+begin
+  if linhaSelecionadaGrid <> 0 then
+  begin
+    oidAtendimentoSelecionado:= StrToInt(sgridHorarios.Cells[8, linhaSelecionadaGrid]);
+    idRegistroEditar:= oidAtendimentoSelecionado;
+
+    if oidAtendimentoSelecionado <> 0 then
+    begin
+
+        listaAtendimento:= tempListaAtendimento.RetornarLista;
+        for atendimentoSelecionado in listaAtendimento do
+        begin
+          if atendimentoSelecionado.oidReal = oidAtendimentoSelecionado then
+          begin
+
+
+            Clipboard.AsText := atendimentoSelecionado.descricao;
+
+            keybd_event(VK_CONTROL,0,KEYEVENTF_EXTENDEDKEY or 0,0);
+            {keybd_event(ord('V'),0,0,0); }
+            keybd_event(VK_CONTROL,$45,KEYEVENTF_EXTENDEDKEY or KEYEVENTF_KEYUP,0);
+           Clipboard.Free;
+          end;
+        end;
+    end
+    else
+    begin
+       ShowMessage('Selecione um Registro!');
+    end;
+  end
+  else
+    ShowMessage('Selecione um Registro!');
+end;
+
+procedure TfrmAtendimento.pmenuEditarClick(Sender: TObject);
 var
   oidAtendimentoSelecionado: Integer;
   atendimentoSelecionado: TclassAtendimento;
@@ -327,7 +369,7 @@ begin
   ckbLancadoHD.Checked:= false;
 end;
 
-procedure TfrmAtendimento.Marcarcomolanado1Click(Sender: TObject);
+procedure TfrmAtendimento.pmenuMarcarLancClick(Sender: TObject);
 var
   oidAtendimentoSelecionado: Integer;
   atendimentoSelecionado: TclassAtendimento;
