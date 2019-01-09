@@ -238,26 +238,10 @@ object frmInstalacao: TfrmInstalacao
       object CategoryPanel2: TCategoryPanel
         AlignWithMargins = True
         Top = 150
-        Height = 125
+        Height = 139
         Margins.Top = 15
         Caption = 'Primestart Client'
         TabOrder = 0
-        ExplicitLeft = 4
-        ExplicitTop = 165
-        object CategoryPanelGroup2: TCategoryPanelGroup
-          Left = 0
-          Top = 0
-          Height = 99
-          VertScrollBar.Tracking = True
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWindowText
-          HeaderFont.Height = -11
-          HeaderFont.Name = 'Tahoma'
-          HeaderFont.Style = []
-          TabOrder = 0
-          ExplicitLeft = 56
-          ExplicitHeight = 350
-        end
       end
       object CategoryPanel1: TCategoryPanel
         AlignWithMargins = True
@@ -277,9 +261,7 @@ object frmInstalacao: TfrmInstalacao
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
-    ExplicitLeft = 153
-    ExplicitWidth = 572
-    ExplicitHeight = 404
+    Visible = False
     object pnTitulo: TPanel
       Left = 1
       Top = 1
@@ -289,7 +271,6 @@ object frmInstalacao: TfrmInstalacao
       Color = clMenuBar
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 570
     end
     object pnConteudo: TPanel
       Left = 1
@@ -298,8 +279,8 @@ object frmInstalacao: TfrmInstalacao
       Height = 372
       Align = alClient
       TabOrder = 1
-      ExplicitWidth = 570
-      ExplicitHeight = 361
+      ExplicitLeft = -2
+      ExplicitTop = 43
     end
   end
 end

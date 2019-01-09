@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, ExtCtrls, StdCtrls, ButtonGroup, Buttons, Grids,
-  ComCtrls, TabNotBk, dblookup, untAtendimento;
+  ComCtrls, TabNotBk, dblookup, untAtendimento,untInstalacao, untNotificacao;
 
 type
   TfrmPrincipal = class(TForm)
@@ -23,6 +23,8 @@ type
     pnMouTreina: TPanel;
     pnMouTemp: TPanel;
     pnMouManu: TPanel;
+    pnNotificacao: TPanel;
+    pnMouNot: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure AjustarAlinhamento();
@@ -40,6 +42,11 @@ type
     procedure pnTreinamentoMouseLeave(Sender: TObject);
     procedure pnManutencaoClick(Sender: TObject);
     procedure pnAtendimentoClick(Sender: TObject);
+    procedure pnInstalacaoClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure pnNotificacaoClick(Sender: TObject);
+    procedure pnNotificacaoMouseEnter(Sender: TObject);
+    procedure pnNotificacaoMouseLeave(Sender: TObject);
   private
     { Private declarations }
     tamanhoBloco, metadeBloco: integer;
@@ -54,6 +61,29 @@ implementation
 
 {$R *.dfm}
 
+procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  result: integer;
+begin
+  if (frmAtendimento <> nil) and (frmAtendimento.estaSalvo = false) then
+  begin
+    result:= Application.MessageBox('Deseja salvar os registros do módulo atendimento?','CUIDADO!',MB_YESNOCANCEL +
+                           MB_ICONQUESTION + MB_DEFBUTTON2);
+    if result = IDYES Then
+     begin
+        frmAtendimento.sbtnSalvarHorario.Click;
+     end
+     else
+     begin
+       if result = IDCANCEL then
+       begin
+          CanClose:= false;
+       end;
+     end;
+  end;
+
+end;
+
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 
 begin
@@ -66,15 +96,55 @@ begin
   AjustarAlinhamento;
 end;
 
-
-
-
 procedure TfrmPrincipal.pnAtendimentoClick(Sender: TObject);
 begin
+  if frmAtendimento = nil then
+  begin
+    Application.CreateForm(TfrmAtendimento, frmAtendimento);
+    frmPrincipal.Width:= frmAtendimento.Width;
+    frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height + 20;
+  end
+  else
+  begin
+    frmAtendimento.Show;
+    frmPrincipal.Width:= frmAtendimento.Width;
+    frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height;
+  end;
+  AjustarAlinhamento;
+end;
 
+procedure TfrmPrincipal.pnInstalacaoClick(Sender: TObject);
+begin
+  if frmInstalacao = nil then
+  begin
+    Application.CreateForm(TfrmInstalacao, frmInstalacao);
+    frmPrincipal.Width:= frmInstalacao.Width;
+    frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height + 20;
+  end
+  else
+  begin
+    frmInstalacao.Show;
+    frmPrincipal.Width:= frmInstalacao.Width;
+    frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height;
+  end;
+  AjustarAlinhamento;
+end;
 
-  Application.CreateForm(TfrmAtendimento, frmAtendimento);
-  Application.Run;
+procedure TfrmPrincipal.pnNotificacaoClick(Sender: TObject);
+begin
+  if frmNotificacao = nil then
+  begin
+    Application.CreateForm(TfrmNotificacao, frmNotificacao);
+    frmNotificacao.Width:= frmNotificacao.Width;
+    frmNotificacao.Height:= frmNotificacao.Height + pnMenu.Height + 20;
+  end
+  else
+  begin
+    frmNotificacao.Show;
+    frmPrincipal.Width:= frmNotificacao.Width;
+    frmPrincipal.Height:= frmNotificacao.Height + pnMenu.Height;
+  end;
+  AjustarAlinhamento;
 end;
 
 procedure TfrmPrincipal.pnAtendimentoMouseEnter(Sender: TObject);
@@ -120,6 +190,16 @@ end;
 procedure TfrmPrincipal.pnManutencaoMouseLeave(Sender: TObject);
 begin
     pnMouManu.Visible:=false;
+end;
+
+procedure TfrmPrincipal.pnNotificacaoMouseEnter(Sender: TObject);
+begin
+  pnMouNot.Visible:=true;
+end;
+
+procedure TfrmPrincipal.pnNotificacaoMouseLeave(Sender: TObject);
+begin
+  pnMouNot.Visible:=false;
 end;
 
 procedure TfrmPrincipal.pnTemplateMouseEnter(Sender: TObject);
@@ -169,6 +249,9 @@ begin
   if pnIniciante.Visible then
     numBlocos:= numBlocos + 1;
     tamanhoDisp:= tamanhoDisp + pnIniciante.Width + 10;
+  if pnNotificacao.Visible then
+    numBlocos:= numBlocos + 1;
+    tamanhoDisp:= tamanhoDisp + pnNotificacao.Width + 10;
 
   tamanhoBloco:= tamanhoDisp div numBlocos;
   metadeBloco:= tamanhoBloco div 2;
@@ -182,6 +265,16 @@ begin
   pnTreinamento.Left:= (tamanhoBloco * 3) + metadeBloco - (pnTreinamento.Width div 2);
   pnTemplate.Left:= (tamanhoBloco * 4) + metadeBloco - (pnTemplate.Width div 2);
   pnIniciante.Left:= (tamanhoBloco * 5) + metadeBloco  - (pnIniciante.Width div 2);
+  pnNotificacao.Left:= (tamanhoBloco * 6) + metadeBloco  - (pnNotificacao.Width div 2);
+
+  if frmAtendimento <> nil then
+    frmAtendimento.pgControl.Left:= (frmPrincipal.Width div 2) - (frmAtendimento.pgControl.Width div 2);
+  if frmAtendimento <> nil then
+    frmAtendimento.pgControl.Left:= (frmPrincipal.Width div 2) - (frmAtendimento.pgControl.Width div 2);
+  if frmNotificacao <> nil then
+    frmNotificacao.pgControl.Left:= (frmPrincipal.Width div 2) - (frmNotificacao.pgControl.Width div 2);
+
+
 end;
 
 end.

@@ -1,0 +1,19 @@
+program sisthelp;
+
+uses
+  Forms,
+  untPrincipal in 'untPrincipal.pas' {frmPrincipal},
+  untAtendimento in 'untAtendimento.pas' {frmAtendimento},
+  classAtendimento in 'classAtendimento.pas',
+  classListaAtendimento in 'classListaAtendimento.pas',
+  untInstalacao in 'untInstalacao.pas' {frmInstalacao},
+  untThreadExpXML in 'untThreadExpXML.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.Run;
+end.

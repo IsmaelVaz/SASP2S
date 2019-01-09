@@ -6,8 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, Buttons, StrUtils, Grids, classAtendimento,
   classListaAtendimento, Generics.Collections, xmldom, XMLIntf, msxmldom,
-  XMLDoc, untThreadExpXML,
-  Menus, ClipBrd;
+  XMLDoc, untThreadExpXML, Menus, ClipBrd;
 
 type
   TfrmAtendimento = class(TForm)
@@ -90,7 +89,6 @@ type
 
 var
   frmAtendimento: TfrmAtendimento;
-
 implementation
 
 {$R *.dfm}

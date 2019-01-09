@@ -3,7 +3,7 @@
 			<ProjectGuid>{B98AA18A-BC21-4B90-97D7-BD4326219908}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
 			<MainSource>sisthelp.dpr</MainSource>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -46,15 +46,18 @@
 			<DCCReference Include="untPrincipal.pas">
 				<Form>frmPrincipal</Form>
 			</DCCReference>
-			<DCCReference Include="untAtendimento.pas">
+			<DCCReference Include="CRUD\untAtendimento.pas">
 				<Form>frmAtendimento</Form>
 			</DCCReference>
-			<DCCReference Include="classAtendimento.pas"/>
-			<DCCReference Include="classListaAtendimento.pas"/>
-			<DCCReference Include="untInstalacao.pas">
+			<DCCReference Include="CRUD\untInstalacao.pas">
 				<Form>frmInstalacao</Form>
 			</DCCReference>
-			<DCCReference Include="untThreadExpXML.pas"/>
+			<DCCReference Include="CRUD\untNotificacao.pas">
+				<Form>frmNotificacao</Form>
+			</DCCReference>
+			<DCCReference Include="CLASS\classAtendimento.pas"/>
+			<DCCReference Include="CLASS\classListaAtendimento.pas"/>
+			<DCCReference Include="THREAD\untThreadExpXML.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

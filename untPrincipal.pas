@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, ExtCtrls, StdCtrls, ButtonGroup, Buttons, Grids,
-  ComCtrls, TabNotBk, dblookup, untAtendimento,untInstalacao;
+  ComCtrls, TabNotBk, dblookup, untAtendimento, untInstalacao, untNotificacao;
 
 type
   TfrmPrincipal = class(TForm)
@@ -85,13 +85,11 @@ begin
 end;
 
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
-
 begin
   AjustarAlinhamento;
 end;
 
 procedure TfrmPrincipal.FormResize(Sender: TObject);
-
 begin
   AjustarAlinhamento;
 end;
@@ -110,7 +108,7 @@ begin
     frmPrincipal.Width:= frmAtendimento.Width;
     frmPrincipal.Height:= frmAtendimento.Height + pnMenu.Height;
   end;
-
+  AjustarAlinhamento;
 end;
 
 procedure TfrmPrincipal.pnInstalacaoClick(Sender: TObject);
@@ -127,6 +125,24 @@ begin
     frmPrincipal.Width:= frmInstalacao.Width;
     frmPrincipal.Height:= frmInstalacao.Height + pnMenu.Height;
   end;
+  AjustarAlinhamento;
+end;
+
+procedure TfrmPrincipal.pnNotificacaoClick(Sender: TObject);
+begin
+  if frmNotificacao = nil then
+  begin
+    Application.CreateForm(TfrmNotificacao, frmNotificacao);
+    frmNotificacao.Width:= frmNotificacao.Width;
+    frmNotificacao.Height:= frmNotificacao.Height + pnMenu.Height + 20;
+  end
+  else
+  begin
+    frmNotificacao.Show;
+    frmPrincipal.Width:= frmNotificacao.Width;
+    frmPrincipal.Height:= frmNotificacao.Height + pnMenu.Height;
+  end;
+  AjustarAlinhamento;
 end;
 
 procedure TfrmPrincipal.pnAtendimentoMouseEnter(Sender: TObject);
@@ -172,11 +188,6 @@ end;
 procedure TfrmPrincipal.pnManutencaoMouseLeave(Sender: TObject);
 begin
     pnMouManu.Visible:=false;
-end;
-
-procedure TfrmPrincipal.pnNotificacaoClick(Sender: TObject);
-begin
-  SHOWMESSAGE('TESTE') ;
 end;
 
 procedure TfrmPrincipal.pnNotificacaoMouseEnter(Sender: TObject);
@@ -256,6 +267,10 @@ begin
 
   if frmAtendimento <> nil then
     frmAtendimento.pgControl.Left:= (frmPrincipal.Width div 2) - (frmAtendimento.pgControl.Width div 2);
+
+ if frmNotificacao <> nil then
+    frmNotificacao.pnGeral.Left:= (frmPrincipal.Width div 2) - (frmNotificacao.pnGeral.Width div 2);
+
 end;
 
 end.

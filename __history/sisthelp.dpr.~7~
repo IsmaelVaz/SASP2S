@@ -3,12 +3,12 @@ program sisthelp;
 uses
   Forms,
   untPrincipal in 'untPrincipal.pas' {frmPrincipal},
+  classAtendimento in 'classAtendimento.pas',
+  classListaAtendimento in 'classListaAtendimento.pas',
+  untThreadExpXML in 'untThreadExpXML.pas',
   untAtendimento in 'CRUD\untAtendimento.pas' {frmAtendimento},
   untInstalacao in 'CRUD\untInstalacao.pas' {frmInstalacao},
-  untNotificacao in 'CRUD\untNotificacao.pas' {frmNotificacao},
-  classAtendimento in 'CLASS\classAtendimento.pas',
-  classListaAtendimento in 'CLASS\classListaAtendimento.pas',
-  untThreadExpXML in 'THREAD\untThreadExpXML.pas';
+  untNotificacao in 'CRUD\untNotificacao.pas' {frmNotificacao};
 
 {$R *.res}
 

@@ -16,7 +16,6 @@ type
     CategoryPanelGroup1: TCategoryPanelGroup;
     CategoryPanel1: TCategoryPanel;
     CategoryPanel2: TCategoryPanel;
-    CategoryPanelGroup2: TCategoryPanelGroup;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
